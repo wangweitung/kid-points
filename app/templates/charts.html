@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}{{ year }}-{{ '%02d'|format(month) }} 图表 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ year }} 年 {{ month }} 月图表</h1>
+    <p class="muted">本月数据一览</p>
+  </div>
+  <div class="chips">
+    <span class="chip chip-balance">当前余额 <b>{{ balance|fmt }}</b> 分</span>
+  </div>
+</div>
+
+<div class="month-nav">
+  <a class="btn btn-ghost" href="{{ url_for('views.charts', child=child['id'], **prev_query) }}">← 上月</a>
+  <span class="month-label">{{ year }}-{{ '%02d'|format(month) }}</span>
+  <a class="btn btn-ghost" href="{{ url_for('views.charts', child=child['id'], **next_query) }}">下月 →</a>
+</div>
+
+<div class="stat-row">
+  <div class="stat-tile">
+    <div class="stat-label">本月得分</div>
+    <div class="stat-value">{{ chart_data.stats.month_score|fmt }}</div>
+    <div class="stat-unit">分</div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">本月支出</div>
+    <div class="stat-value">{{ chart_data.stats.month_expense|fmt }}</div>
+    <div class="stat-unit">分</div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">月末余额</div>
+    <div class="stat-value">{{ chart_data.stats.closing_balance|fmt }}</div>
+    <div class="stat-unit">分</div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">打卡天数</div>
+    <div class="stat-value">{{ chart_data.stats.days_tracked }}</div>
+    <div class="stat-unit">天 · {{ chart_data.stats.total_checkins }} 次</div>
+  </div>
+</div>
+
+<div class="chart-grid">
+  <div class="card chart-card">
+    <h2>每日得分</h2>
+    <div class="chart-box"><canvas id="chart-daily"></canvas></div>
+  </div>
+
+  <div class="card chart-card">
+    <h2>余额走势</h2>
+    <div class="chart-box"><canvas id="chart-balance"></canvas></div>
+  </div>
+
+  <div class="card chart-card">
+    <h2>支出构成</h2>
+    {% if chart_data.expenses %}
+      <div class="chart-box chart-box-tall"><canvas id="chart-expense"></canvas></div>
+    {% else %}
+      <p class="muted center pad">本月还没有支出记录</p>
+    {% endif %}
+  </div>
+
+  <div class="card chart-card">
+    <h2>各任务完成次数</h2>
+    {% if chart_data.task_counts %}
+      <div class="chart-box chart-box-tall"><canvas id="chart-tasks"></canvas></div>
+    {% else %}
+      <p class="muted center pad">本月还没有打卡记录</p>
+    {% endif %}
+  </div>
+</div>
+
+<details class="card table-view">
+  <summary>数据表（每日得分 / 余额）</summary>
+  <table class="data-table">
+    <thead><tr><th>日期</th><th class="num">得分</th><th class="num">余额</th></tr></thead>
+    <tbody id="daily-table-body"></tbody>
+  </table>
+</details>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='chart.umd.js') }}"></script>
+<script>
+(function () {
+  const DATA = {{ chart_data|tojson }};
+  const BLUE = '#2a78d6';
+  const ORANGE = '#eb6834';
+  const GRID = '#e1e0d9';
+  const AXIS = '#c3c2b7';
+  const MUTED = '#898781';
+
+  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+  Chart.defaults.color = MUTED;
+
+  const tooltipStyle = {
+    backgroundColor: '#0b0b0b',
+    titleColor: '#f0efec',
+    bodyColor: '#f0efec',
+    padding: 10,
+    cornerRadius: 6
+  };
+
+  function axisX() {
+    return {
+      grid: { display: false },
+      border: { color: AXIS },
+      ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 8 }
+    };
+  }
+
+  function axisY(beginZero) {
+    return {
+      beginAtZero: beginZero !== false,
+      grid: { color: GRID, drawTicks: false },
+      border: { display: false },
+      ticks: { color: MUTED, precision: 0 }
+    };
+  }
+
+  const dailyCanvas = document.getElementById('chart-daily');
+  if (dailyCanvas) {
+    new Chart(dailyCanvas, {
+      type: 'bar',
+      data: {
+        labels: DATA.labels,
+        datasets: [{
+          data: DATA.daily_scores,
+          backgroundColor: BLUE,
+          borderRadius: 4,
+          borderSkipped: 'start',
+          barPercentage: 0.75,
+          categoryPercentage: 0.85
+        }]
+      },
+      options: {
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 得分 ' + c.parsed.y + ' 分' } }
+        },
+        scales: { x: axisX(), y: axisY(true) }
+      }
+    });
+  }
+
+  const balanceCanvas = document.getElementById('chart-balance');
+  if (balanceCanvas) {
+    new Chart(balanceCanvas, {
+      type: 'line',
+      data: {
+        labels: DATA.labels,
+        datasets: [{
+          data: DATA.balances,
+          borderColor: ORANGE,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: ORANGE,
+          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderWidth: 2,
+          tension: 0.25,
+          fill: false
+        }]
+      },
+      options: {
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 余额 ' + c.parsed.y + ' 分' } }
+        },
+        scales: { x: axisX(), y: axisY(false) }
+      }
+    });
+  }
+
+  function rankedBar(canvasId, items, labelFormatter) {
+    const el = document.getElementById(canvasId);
+    if (!el) return;
+    new Chart(el, {
+      type: 'bar',
+      indexAxis: 'y',
+      data: {
+        labels: items.map(i => i.label),
+        datasets: [{
+          data: items.map(i => i.value),
+          backgroundColor: BLUE,
+          borderRadius: 4,
+          borderSkipped: 'start',
+          barPercentage: 0.7
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' ' + labelFormatter(c.parsed.x) } }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: GRID, drawTicks: false },
+            border: { display: false },
+            ticks: { color: MUTED, precision: 0 }
+          },
+          y: {
+            grid: { display: false },
+            border: { color: AXIS },
+            ticks: { color: MUTED }
+          }
+        }
+      }
+    });
+  }
+
+  rankedBar('chart-expense', DATA.expenses, v => v + ' 分');
+  rankedBar('chart-tasks', DATA.task_counts, v => v + ' 次');
+
+  const tbody = document.getElementById('daily-table-body');
+  DATA.labels.forEach(function (lab, i) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + DATA.year + '-' + String(DATA.month).padStart(2, '0') + '-' + String(lab).padStart(2, '0') +
+      '</td><td class="num">' + DATA.daily_scores[i] + '</td><td class="num">' + DATA.balances[i] + '</td>';
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+{% endblock %}

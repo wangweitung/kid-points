@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}添加小朋友 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="empty-state card">
+  <h1>还没有小朋友</h1>
+  <p class="muted">请先到「管理」页添加小朋友，再开始记录积分。</p>
+  {% if session.get('role') == 'admin' %}
+    <a class="btn btn-primary" href="{{ url_for('admin.panel') }}">去管理页</a>
+  {% endif %}
+</div>
+{% endblock %}

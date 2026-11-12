@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}今日打卡 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>今日打卡</h1>
+    <p class="muted">{{ today_d.isoformat() }} {{ weekday_name }}</p>
+  </div>
+  <div class="chips">
+    <span class="chip chip-balance">余额 <b id="balance">{{ balance|fmt }}</b> 分</span>
+    <span class="chip chip-score">今日 <b id="today-total">{{ today_total|fmt }}</b> 分 · <b id="today-count">{{ today_count }}</b> 项</span>
+  </div>
+</div>
+
+{% if tasks %}
+<div class="task-grid">
+  {% for t in tasks %}
+    <button type="button"
+            class="task-card{% if t['id'] in done_ids %} done{% endif %}"
+            data-tick
+            data-child="{{ child['id'] }}"
+            data-task="{{ t['id'] }}"
+            data-date="{{ today_d.isoformat() }}">
+      <span class="task-check">✓</span>
+      <span class="task-name">{{ t['name'] }}</span>
+      <span class="task-value">+{{ t['value']|fmt }}</span>
+    </button>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">还没有任务，请管理员在「管理」页添加。</p>
+{% endif %}
+
+<div class="strip">
+  {% for s in strip %}
+    <div class="strip-day{% if s.is_today %} today{% endif %}">
+      <div class="strip-label">{{ s.wday }}</div>
+      <div class="strip-date">{{ s.date.strftime('%m-%d') }}</div>
+      <div class="strip-score{% if s.count %} has-score{% endif %}">{{ s.total|fmt if s.count else '—' }}</div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

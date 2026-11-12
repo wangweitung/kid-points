@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}兑换 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>兑换</h1>
+    <p class="muted">想换哪项，点「兑换」即可，存折自动记支出。</p>
+  </div>
+  <div class="chips">
+    <span class="chip chip-balance">余额 <b id="balance">{{ balance|fmt }}</b> 分</span>
+    <span class="chip">本月已兑换 <b>{{ month_redemptions|fmt }}</b> 分</span>
+  </div>
+</div>
+
+<div class="redeem-grid">
+  {% for item in items %}
+  <div class="card redeem-card{% if balance < item['price'] %} poor{% endif %}">
+    <div class="redeem-price">{{ item['price']|fmt }} <small>分</small></div>
+    <div class="redeem-name">{{ item['name'] }}</div>
+    {% if session.get('role') == 'admin' %}
+    <form method="post" action="{{ url_for('views.redeem_do') }}"
+          onsubmit="return confirm('确定用 {{ item['price']|fmt }} 分兑换「{{ item['name'] }}」吗？')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="item_id" value="{{ item['id'] }}">
+      <button type="submit" class="btn btn-primary" {% if balance < item['price'] %}disabled{% endif %}>
+        {% if balance < item['price'] %}积分不足{% else %}兑换{% endif %}
+      </button>
+    </form>
+    {% else %}
+    <p class="muted">{% if balance < item['price'] %}积分不足{% else %}请管理员登记兑换{% endif %}</p>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="muted">还没有兑换商品，请管理员添加。</p>
+  {% endfor %}
+</div>
+
+<div class="table-wrap card">
+  <h2>本月兑换记录</h2>
+  <table class="data-table">
+    <thead><tr><th>日期</th><th>兑换了什么</th><th class="num">支出 −</th></tr></thead>
+    <tbody>
+      {% for h in history %}
+      <tr>
+        <td>{{ h['date'] }}</td>
+        <td>{{ h['reason'] }}</td>
+        <td class="num expense">{{ h['expense']|fmt }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="muted center">本月还没有兑换记录</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if session.get('role') == 'admin' %}
+<div class="card">
+  <h2>兑换价目管理</h2>
+  <form method="post" action="{{ url_for('views.catalog_add') }}" class="form-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>名称 <input type="text" name="name" placeholder="如：去公园玩" required></label>
+    <label>分值 <input type="number" name="price" min="1" step="1" required></label>
+    <button type="submit" class="btn btn-primary">添加</button>
+  </form>
+  <table class="data-table">
+    <thead><tr><th>分值</th><th>名称</th><th>操作</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td colspan="3">
+          <form method="post" action="{{ url_for('views.catalog_update') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <input type="number" name="price" value="{{ item['price']|int if item['price'] == item['price|int'] else item['price'] }}" min="1" step="1" class="w-90" title="分值">
+            <input type="text" name="name" value="{{ item['name'] }}" class="w-240" title="名称">
+            <button type="submit" class="btn btn-small">保存</button>
+          </form>
+          <form method="post" action="{{ url_for('views.catalog_delete') }}" class="inline"
+                onsubmit="return confirm('确定删除「{{ item['name'] }}」吗？')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <button type="submit" class="btn-link danger">删除</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

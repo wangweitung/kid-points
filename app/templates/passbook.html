@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}积分存折 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>积分存折</h1>
+    <p class="muted">余额 = 期初 + 收入 − 支出</p>
+  </div>
+  <div class="chips">
+    <span class="chip">期初 <b>{{ initial_balance|fmt }}</b></span>
+    <span class="chip chip-balance">当前余额 <b id="balance">{{ balance|fmt }}</b></span>
+  </div>
+</div>
+
+<div class="month-nav">
+  <a class="btn btn-ghost" href="{{ url_for('views.passbook', child=child['id'], **prev_query) }}">← 上月</a>
+  <span class="month-label">{{ year }}-{{ '%02d'|format(month) }}</span>
+  <a class="btn btn-ghost" href="{{ url_for('views.passbook', child=child['id'], **next_query) }}">下月 →</a>
+</div>
+
+<div class="table-wrap card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>日期</th><th>事由（得分 / 兑换了什么）</th>
+        <th class="num">收入 +</th><th class="num">支出 −</th><th class="num">余额</th>
+        <th>备注</th><th>来源</th>{% if session.get('role') == 'admin' %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+      <tr>
+        <td>{{ e['date'] }}</td>
+        <td>{{ e['reason'] }}</td>
+        <td class="num income">{{ e['income']|fmt if e['income'] else '' }}</td>
+        <td class="num expense">{{ e['expense']|fmt if e['expense'] else '' }}</td>
+        <td class="num">{{ e['balance']|fmt }}</td>
+        <td class="muted">{{ e['note'] }}</td>
+        <td><span class="tag tag-{{ e['source'] }}">{{ source_labels.get(e['source'], e['source']) }}</span></td>
+        {% if session.get('role') == 'admin' %}
+        <td>
+          {% if e['source'] != 'daily' %}
+          <form method="post" action="{{ url_for('views.passbook_delete') }}" class="inline"
+                onsubmit="return confirm('确定删除这条记录吗？')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ e['id'] }}">
+            <button type="submit" class="btn-link danger">删除</button>
+          </form>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="muted center">本月还没有记录</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">合计</td>
+        <td class="num income">{{ total_income|fmt }}</td>
+        <td class="num expense">{{ total_expense|fmt }}</td>
+        <td class="num">{{ balance|fmt }}</td>
+        <td colspan="3"></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+{% if session.get('role') == 'admin' %}
+<div class="card">
+  <h2>手动记一笔</h2>
+  <form method="post" action="{{ url_for('views.passbook_add') }}" class="form-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>日期 <input type="date" name="date" value="{{ today_d.isoformat() }}" max="{{ today_d.isoformat() }}"></label>
+    <label>事由 <input type="text" name="reason" placeholder="如：做家务奖励 / 买零食" required></label>
+    <label>收入 + <input type="number" name="income" min="0" step="0.5" placeholder="0"></label>
+    <label>支出 − <input type="number" name="expense" min="0" step="0.5" placeholder="0"></label>
+    <label>备注 <input type="text" name="note"></label>
+    <button type="submit" class="btn btn-primary">记入</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}小星星积分计划{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('views.today') }}">⭐ 小星星积分计划</a>
+  <nav class="nav">
+    <a href="{{ url_for('views.today') }}">今日</a>
+    <a href="{{ url_for('views.week') }}">周视图</a>
+    <a href="{{ url_for('views.passbook') }}">存折</a>
+    <a href="{{ url_for('views.redeem') }}">兑换</a>
+    <a href="{{ url_for('views.charts') }}">图表</a>
+    <a href="{{ url_for('views.help') }}">说明</a>
+    {% if session.get('role') == 'admin' %}
+      <a class="nav-admin" href="{{ url_for('admin.panel') }}">管理</a>
+    {% endif %}
+  </nav>
+  <div class="userbox">
+    {% if children is defined and children %}
+      <select class="child-switch" data-switch-child title="切换小朋友">
+        {% for c in children %}
+          <option value="{{ c['id'] }}" {% if child is defined and child and child['id'] == c['id'] %}selected{% endif %}>{{ c['name'] }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+    <span class="who">{{ session.get('username', '') }}</span>
+    <a class="logout" href="{{ url_for('auth.logout') }}">退出</a>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

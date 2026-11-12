@@ -1,0 +1,10 @@
+services:
+  kid-points:
+    build: .
+    image: kid-points:latest
+    container_name: kid-points
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

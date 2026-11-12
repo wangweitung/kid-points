@@ -1,0 +1,10 @@
+.venv
+data
+.git
+.github
+__pycache__
+*.pyc
+*.xlsx
+.agent_context
+.claude
+.mico

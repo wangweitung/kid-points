@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}第 {{ week_no }} 周积分卡 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>第 {{ week_no }} 周积分卡</h1>
+    <p class="muted">{{ week_start.isoformat() }} ~ {{ week_end.isoformat() }}</p>
+  </div>
+  <div class="chips">
+    <span class="chip chip-balance">余额 <b id="balance">{{ balance|fmt }}</b> 分</span>
+    <span class="chip chip-score">本周得分 <b id="week-score">{{ week_score|fmt }}</b> 分</span>
+  </div>
+</div>
+
+<div class="week-nav">
+  <a class="btn btn-ghost" href="{{ url_for('views.week', date=prev_date, child=child['id']) }}">← 上周</a>
+  <a class="btn btn-ghost" href="{{ url_for('views.week', date=today_d.isoformat(), child=child['id']) }}">本周</a>
+  <a class="btn btn-ghost" href="{{ url_for('views.week', date=next_date, child=child['id']) }}">下周 →</a>
+</div>
+
+<div class="table-wrap card">
+  <table class="week-table">
+    <thead>
+      <tr>
+        <th class="col-task">做什么</th>
+        <th class="col-value">分值</th>
+        {% for w in weekday_names %}<th class="col-day">{{ w }}</th>{% endfor %}
+        <th class="col-sum">本周得分</th>
+        <th class="col-sum">完成天数</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in task_rows %}
+      <tr>
+        <td class="col-task">{{ row.task['name'] }}</td>
+        <td class="col-value">{{ row.task['value']|fmt }}</td>
+        {% for i in range(7) %}
+          {% set d = days[i] %}
+          <td class="cell{% if row.checked[i] %} done{% endif %}{% if d > today_d %} future{% endif %}"
+              {% if d <= today_d %}data-tick data-child="{{ child['id'] }}" data-task="{{ row.task['id'] }}" data-date="{{ d.isoformat() }}"{% endif %}>{% if row.checked[i] %}✓{% endif %}</td>
+        {% endfor %}
+        <td class="num col-sum" data-task-score="{{ row.task['id'] }}">{{ row.score|fmt if row.score is not none else '' }}</td>
+        <td class="num col-sum" data-task-days="{{ row.task['id'] }}">{{ row.days }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="row-total">
+        <td class="col-task">今日得分</td>
+        <td class="col-value"></td>
+        {% for d in days %}
+          <td class="num col-day" data-day-total="{{ d.isoformat() }}">{{ day_totals[loop.index0]|fmt if day_totals[loop.index0] else '' }}</td>
+        {% endfor %}
+        <td class="num col-sum" id="week-total">{{ week_score|fmt }}</td>
+        <td class="num col-sum" id="week-days">{{ week_days }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="week-cols">
+  <div class="card settle">
+    <h2>本周结算</h2>
+    <dl>
+      <div><dt>期初结余</dt><dd id="set-opening">{{ settlement.opening|fmt }}</dd></div>
+      <div><dt>本周得分</dt><dd id="set-earned">{{ settlement.earned|fmt }}</dd></div>
+      <div><dt>合计可用</dt><dd id="set-available">{{ settlement.available|fmt }}</dd></div>
+      <div><dt>本周兑换</dt><dd id="set-spent">{{ settlement.spent|fmt }}</dd></div>
+      <div class="settle-carry"><dt>转入下周</dt><dd id="set-carry">{{ settlement.carry|fmt }}</dd></div>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>兑换价目</h2>
+    <table class="data-table">
+      <thead><tr><th>分值</th><th>可以换什么</th><th>换了吗</th></tr></thead>
+      <tbody>
+        {% for item in catalog %}
+        <tr>
+          <td>{{ item['price']|fmt }}</td>
+          <td>{{ item['name'] }}</td>
+          <td class="check{% if item['name'] in redeemed %} on{% endif %}">{% if item['name'] in redeemed %}✓{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="muted">去<a href="{{ url_for('views.redeem', child=child['id']) }}">兑换页</a>登记兑换。</p>
+  </div>
+</div>
+
+<div class="card note-card">
+  <h2>本周最棒的一件事</h2>
+  <form method="post" action="{{ url_for('views.week_note') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="week_start" value="{{ week_start.isoformat() }}">
+    <textarea name="note" rows="2" placeholder="记下这周她最棒的一件事……">{{ note }}</textarea>
+    <button type="submit" class="btn btn-primary">保存</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}管理 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>管理</h1>
+</div>
+
+<div class="admin-grid">
+  <div class="card">
+    <h2>注册开关</h2>
+    <p class="muted">关闭后，登录页不再显示注册入口。</p>
+    <form method="post" action="{{ url_for('admin.registration') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% if registration_open %}
+        <input type="hidden" name="open" value="0">
+        <button type="submit" class="btn btn-danger">当前：已开启注册 · 点击关闭</button>
+      {% else %}
+        <input type="hidden" name="open" value="1">
+        <button type="submit" class="btn btn-primary">当前：已关闭注册 · 点击开启</button>
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>添加任务</h2>
+    <form method="post" action="{{ url_for('admin.task_add') }}" class="form-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>任务 <input type="text" name="name" placeholder="如：练琴 30 分钟" required></label>
+      <label>分值 <input type="number" name="value" min="0.5" step="0.5" required></label>
+      <button type="submit" class="btn btn-primary">添加</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>添加小朋友</h2>
+    <form method="post" action="{{ url_for('admin.child_add') }}" class="form-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>姓名 <input type="text" name="name" placeholder="如：Morning" required></label>
+      <label>期初余额 <input type="number" name="initial_balance" min="0" step="1" value="0"></label>
+      <button type="submit" class="btn btn-primary">添加</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <h2>任务管理</h2>
+  <table class="data-table">
+    <thead><tr><th>任务</th><th>分值</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+      {% for t in tasks %}
+      <tr class="{% if not t['active'] %}row-inactive{% endif %}">
+        <td colspan="4">
+          <form method="post" action="{{ url_for('admin.task_update') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ t['id'] }}">
+            <input type="text" name="name" value="{{ t['name'] }}" class="w-320" title="任务名">
+            <input type="number" name="value" value="{{ t['value']|int if t['value'] == t['value|int'] else t['value'] }}" min="0.5" step="0.5" class="w-90" title="分值">
+            <button type="submit" class="btn btn-small">保存</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.task_toggle') }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ t['id'] }}">
+            <button type="submit" class="btn btn-small {% if t['active'] %}btn-ghost{% else %}btn-primary{% endif %}">
+              {% if t['active'] %}停用{% else %}启用{% endif %}
+            </button>
+          </form>
+          {% if not t['active'] %}<span class="tag tag-off">已停用</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>小朋友管理</h2>
+  <table class="data-table">
+    <thead><tr><th>姓名</th><th>期初余额</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+      {% for c in children %}
+      <tr class="{% if not c['active'] %}row-inactive{% endif %}">
+        <td colspan="4">
+          <form method="post" action="{{ url_for('admin.child_update') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ c['id'] }}">
+            <input type="text" name="name" value="{{ c['name'] }}" class="w-240" title="姓名">
+            <input type="number" name="initial_balance" value="{{ c['initial_balance']|fmt }}" min="0" step="1" class="w-140" title="期初余额">
+            <input type="hidden" name="active" value="{{ 1 if c['active'] else 0 }}">
+            <button type="submit" class="btn btn-small">保存</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.child_update') }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ c['id'] }}">
+            <input type="hidden" name="name" value="{{ c['name'] }}">
+            <input type="hidden" name="initial_balance" value="{{ c['initial_balance'] }}">
+            <input type="hidden" name="active" value="{{ 0 if c['active'] else 1 }}">
+            <button type="submit" class="btn btn-small {% if c['active'] %}btn-ghost{% else %}btn-primary{% endif %}">
+              {% if c['active'] %}停用{% else %}启用{% endif %}
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>用户管理</h2>
+  <table class="data-table">
+    <thead><tr><th>用户名</th><th>角色</th><th>创建时间</th><th>操作</th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u['username'] }}{% if u['id'] == session.get('user_id') %} <span class="tag">我</span>{% endif %}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin.user_update') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ u['id'] }}">
+            <select name="role">
+              <option value="admin" {% if u['role'] == 'admin' %}selected{% endif %}>管理员</option>
+              <option value="user" {% if u['role'] == 'user' %}selected{% endif %}>普通用户</option>
+            </select>
+            <button type="submit" class="btn btn-small">保存</button>
+          </form>
+        </td>
+        <td class="muted">{{ u['created_at'] }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin.user_password') }}" class="inline-form"
+                onsubmit="return confirm('重置 {{ u['username'] }} 的密码？')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ u['id'] }}">
+            <input type="password" name="password" placeholder="新密码" minlength="4" class="w-140">
+            <button type="submit" class="btn btn-small btn-ghost">重置密码</button>
+          </form>
+          {% if u['id'] != session.get('user_id') %}
+          <form method="post" action="{{ url_for('admin.user_delete') }}" class="inline"
+                onsubmit="return confirm('确定删除用户 {{ u['username'] }} 吗？')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ u['id'] }}">
+            <button type="submit" class="btn-link danger">删除</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

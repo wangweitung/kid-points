@@ -1,7 +1,7 @@
 services:
   kid-points:
     build: .
-    image: kid-points:latest
+    image: wangweitung/kid-points:latest
     container_name: kid-points
     ports:
       - "8080:80"

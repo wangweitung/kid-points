@@ -12,6 +12,17 @@
   </div>
 </div>
 
+<div class="strip">
+  {% for s in strip %}
+    <div class="strip-day{% if s.is_today %} today{% endif %}">
+      <div class="strip-label">{{ s.wday }}</div>
+      <div class="strip-date">{{ s.date.strftime('%m-%d') }}</div>
+      <div class="strip-score{% if s.count %} has-score{% endif %}"
+           data-strip-total="{{ s.date.isoformat() }}">{{ s.total|fmt if s.count else '—' }}</div>
+    </div>
+  {% endfor %}
+</div>
+
 {% if tasks %}
 <div class="task-grid">
   {% for t in tasks %}
@@ -30,15 +41,4 @@
 {% else %}
 <p class="muted">还没有任务，请管理员在「管理」页添加。</p>
 {% endif %}
-
-<div class="strip">
-  {% for s in strip %}
-    <div class="strip-day{% if s.is_today %} today{% endif %}">
-      <div class="strip-label">{{ s.wday }}</div>
-      <div class="strip-date">{{ s.date.strftime('%m-%d') }}</div>
-      <div class="strip-score{% if s.count %} has-score{% endif %}"
-           data-strip-total="{{ s.date.isoformat() }}">{{ s.total|fmt if s.count else '—' }}</div>
-    </div>
-  {% endfor %}
-</div>
 {% endblock %}

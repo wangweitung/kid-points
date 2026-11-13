@@ -42,49 +42,8 @@ def _need_child():
 
 @bp.get("/")
 def today():
-    child, early, children = _need_child()
-    if early:
-        return early
-    db = get_db()
-    tasks = db.execute(
-        "SELECT * FROM tasks WHERE active = 1 ORDER BY sort_order, id"
-    ).fetchall()
-    today_d = local_today()
-    done_ids = {
-        r["task_id"]
-        for r in db.execute(
-            "SELECT task_id FROM checkins WHERE child_id = ? AND date = ?",
-            (child["id"], today_d.isoformat()),
-        )
-    }
-    task_ids = {t["id"] for t in tasks}
-    today_total = sum(t["value"] for t in tasks if t["id"] in done_ids)
-    strip = []
-    for i in range(6, -1, -1):
-        d = today_d - timedelta(days=i)
-        cnt, total = day_score(db, child["id"], d)
-        strip.append(
-            {
-                "date": d,
-                "wday": "一二三四五六日"[d.weekday()],
-                "total": total,
-                "count": cnt,
-                "is_today": d == today_d,
-            }
-        )
-    return render_template(
-        "today.html",
-        child=child,
-        children=children,
-        tasks=tasks,
-        done_ids=done_ids,
-        today_d=today_d,
-        weekday_name=WEEKDAY_NAMES[today_d.weekday()],
-        today_total=today_total,
-        today_count=len(done_ids & task_ids),
-        balance=balance_of(child["id"]),
-        strip=strip,
-    )
+    # 今日页已并入周视图（本周的今天列即可直接打卡），根路径重定向过去
+    return redirect(url_for("views.week"))
 
 
 def _tick_state(db, child_id, d: date) -> dict:

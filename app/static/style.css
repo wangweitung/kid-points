@@ -189,75 +189,6 @@ a:hover { text-decoration: none; }
 .flash-error { background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.25); color: #d0342b; }
 .flash.hide { opacity: 0; pointer-events: none; }
 
-/* ---------- today ---------- */
-.task-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
-  gap: 12px;
-  margin-bottom: var(--gap);
-}
-.task-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-align: left;
-  font: inherit;
-  background: var(--surface);
-  border: none;
-  border-radius: var(--radius);
-  padding: 16px;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.12s, box-shadow 0.15s, background 0.15s;
-}
-.task-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.task-card:active { transform: scale(0.98); }
-.task-card.busy { opacity: 0.6; pointer-events: none; }
-.task-check {
-  flex: 0 0 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid #d1d1d6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: transparent;
-  font-weight: 700;
-  font-size: 15px;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
-}
-.task-card.done { background: var(--good-bg); }
-.task-card.done .task-check { background: var(--good); border-color: var(--good); color: #fff; transform: scale(1.08); }
-.task-name { flex: 1; font-weight: 500; }
-.task-value {
-  font-weight: 700;
-  color: var(--primary);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.strip {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: var(--gap);
-}
-.strip-day {
-  background: var(--surface);
-  border: none;
-  border-radius: 12px;
-  text-align: center;
-  padding: 8px 4px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.12s;
-}
-.strip-day:hover { transform: translateY(-2px); }
-.strip-day.today { box-shadow: 0 0 0 2px var(--primary), var(--shadow-sm); }
-.strip-label { font-size: 12px; color: var(--muted); }
-.strip-date { font-size: 11px; color: var(--muted); }
-.strip-score { font-weight: 700; font-size: 16px; color: #c7c7cc; font-variant-numeric: tabular-nums; }
-.strip-score.has-score { color: var(--ink); }
-
 /* ---------- week/month nav ---------- */
 .week-nav, .month-nav {
   display: flex;
@@ -292,28 +223,35 @@ table { border-collapse: collapse; width: 100%; }
 /* week board: grid layout, no horizontal scroll on mobile */
 .week-board {
   display: grid;
-  grid-template-columns: minmax(9em, 1.5fr) 3.4em repeat(7, minmax(2.75em, 1fr)) 3.75em 4.25em;
+  grid-template-columns: minmax(10em, 2fr) 3.5em repeat(7, minmax(3.2em, 1fr)) 4em 4.5em;
   align-items: center;
-  padding: 4px 14px 8px;
+  column-gap: 6px;
+  padding: 8px 16px 12px;
   overflow: visible;
 }
 .wrow { display: contents; }
 .wc {
-  padding: 8px 4px;
+  padding: 10px 4px;
   border-bottom: 1px solid var(--grid);
   text-align: center;
   min-width: 0;
 }
 .wc-name {
   text-align: left;
-  padding-left: 6px;
+  padding-left: 8px;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 .wc-value, .wc-score, .wc-days { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .wc-daystrip { display: contents; }
 .wc-day-date { display: none; }
-.wrow-head .wc { color: var(--muted); font-size: 13px; font-weight: 600; background: var(--fill); }
+.wrow-head .wc {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+  border-bottom: 2px solid var(--grid);
+}
 .wrow-head .wc-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
 .wrow-head .wc-day-date {
   display: block;
@@ -330,7 +268,7 @@ table { border-collapse: collapse; width: 100%; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 42px;
+  height: 46px;
   cursor: pointer;
   user-select: none;
   font-weight: 700;
@@ -344,11 +282,11 @@ table { border-collapse: collapse; width: 100%; }
 .wc.cell.locked { cursor: default; }
 .wc.cell.busy { opacity: 0.6; pointer-events: none; }
 .wrow-total .wc {
-  background: var(--fill);
+  background: transparent;
   font-weight: 700;
   border-bottom: none;
-  border-top: none;
-  padding: 10px 4px;
+  border-top: 2px solid var(--grid);
+  padding: 12px 4px;
 }
 
 /* ---------- month calendar ---------- */
@@ -487,7 +425,13 @@ table { border-collapse: collapse; width: 100%; }
   margin-bottom: var(--gap);
 }
 .admin-grid .card { margin-bottom: 0; }
-.admin-grid .inline-form { margin: 6px 8px 0 0; }
+.switch-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.switch-row .inline-form { margin: 0; }
+.admin-grid .form-row + .form-row {
+  border-top: 1px solid var(--grid);
+  margin-top: 14px;
+  padding-top: 14px;
+}
 .inline { display: inline; }
 .inline-form { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-right: 8px; }
 .form-row {
@@ -591,20 +535,6 @@ code {
 @media (max-width: 860px) {
   .week-cols, .chart-grid { grid-template-columns: 1fr; }
   .container { padding: 16px 12px 50px; }
-  /* strip: 紧凑卡片 */
-  .strip {
-    gap: 4px;
-    padding: 10px 8px;
-  }
-  .strip-day {
-    padding: 4px 2px;
-    min-height: clamp(46px, 12vw, 52px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1px;
-    border-radius: 8px;
-  }
   .cal-card { padding: 10px 8px; }
   .cal-grid { gap: 4px; }
   .cal-cell { min-height: clamp(44px, 11vw, 50px); padding: 4px; border-radius: 8px; }
@@ -659,27 +589,35 @@ code {
   /* 周卡手机端隐藏「天数」列，行更紧凑 */
   .wc-days, .wrow-total .wc-days { display: none; }
 
-  /* week board: 紧凑月历风格, no horizontal scrolling */
-  .week-board { display: block; padding: 10px 8px; }
+  /* week board: 每个任务一张卡片，打卡格白底醒目 */
+  .week-board { display: block; padding: 12px 10px; }
   .wrow {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 2px 8px;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--grid);
+    padding: 0;
+    border-bottom: none;
   }
   .wrow-head { display: none; }
+  .wrow-task, .wrow-total {
+    background: var(--fill);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  .wrow-task:last-child, .wrow-total:last-child { margin-bottom: 0; }
   .wc { border: none; padding: 0; }
-  .wc-name { flex: 1 1 auto; font-weight: 600; }
+  .wc-name { flex: 1 1 auto; padding-left: 2px; font-weight: 600; }
   .wc-value { flex: 0 0 auto; color: var(--muted); font-weight: 600; }
   .wc-score::before { content: "得分 "; font-size: 12px; color: var(--muted); font-weight: 400; }
   .wc-days::before { content: "天数 "; font-size: 12px; color: var(--muted); font-weight: 400; }
-  .wc-daystrip { flex: 0 0 100%; display: flex; gap: 4px; margin-top: 6px; }
+  .wc-daystrip { flex: 0 0 100%; display: flex; gap: 5px; margin-top: 8px; }
   .wc-day-date {
     display: block;
     align-self: flex-start;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--muted);
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
@@ -687,21 +625,18 @@ code {
   .wc.cell {
     flex: 1 1 0;
     min-width: 0;
-    min-height: clamp(44px, 12vw, 48px);
+    min-height: clamp(48px, 13vw, 56px);
     height: auto;
     padding: 4px;
     border-radius: 8px;
+    background: var(--surface);
     align-items: flex-start;
   }
-  .wc.cell .cell-mark { margin: auto; font-size: 15px; }
-  .wc.cell.done .wc-day-date { color: rgba(255, 255, 255, 0.85); }
-  .wrow-total {
-    background: var(--fill);
-    margin: 6px -8px -2px;
-    padding: 8px;
-    border-radius: 10px;
-    border-bottom: none;
-  }
+  .wc.cell .cell-mark { margin: auto; font-size: 16px; }
+  .wc.cell.done { background: var(--good); }
+  .wc.cell.done .wc-day-date { color: rgba(255, 255, 255, 0.9); }
+  .wc.cell.future { background: transparent; border: 1px dashed #d1d1d6; }
+  .wrow-total { padding: 8px 10px; }
   .wrow-total .wc { background: transparent; border-top: none; padding: 0; }
   .wrow-total .wc-day {
     flex: 1 1 0;
@@ -709,7 +644,8 @@ code {
     text-align: right;
     padding-right: 2px;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14px;
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
   .wrow-total .wc-score::before, .wrow-total .wc-days::before { content: none; }
@@ -777,61 +713,39 @@ code {
   .pb-table tfoot td { display: block; padding: 0; border-top: none; }
   .pb-table tfoot td[colspan] { flex: 1 1 auto; font-weight: 700; }
 
-  .admin-table, .admin-table tbody { display: block; width: 100%; }
   .admin-table thead { display: none; }
+  /* 每条记录压成一行：输入框 + 按钮 + 标签横排，仅在放不下时换行 */
   .admin-table tr {
-    display: block;
-    width: 100%;
-    padding: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    padding: 11px 0;
     border-bottom: 1px solid var(--grid);
   }
   .admin-table tr:last-child { border-bottom: none; }
-  .admin-table.data-table td {
-    display: block;
-    width: 100%;
-    padding: 4px 0;
-    border-bottom: none;
-    position: static;
-    box-shadow: none;
-  }
+  .admin-table.data-table td { display: contents; }
   .admin-table .inline-form {
     display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    margin: 0 0 8px;
-    gap: 6px;
     align-items: center;
-  }
-  .admin-table .inline-form input {
-    flex: 1 1 130px;
-    width: auto;
+    gap: 6px;
+    margin: 0;
+    flex: 1 1 200px;
     min-width: 0;
   }
-  .admin-table .inline-form select { flex: 1 1 130px; min-width: 0; }
-  .admin-table .inline {
-    display: flex;
-    width: 100%;
-    margin: 0 0 8px;
-  }
-  .admin-table .inline form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-  }
-  .admin-table .btn-link { margin-left: 0; }
+  .admin-table .inline-form input { flex: 1 1 110px; width: auto; min-width: 0; }
+  .admin-table .inline-form select { flex: 1 1 110px; min-width: 0; }
+  .admin-table .inline { display: flex; margin: 0; flex: 0 0 auto; }
+  .admin-table .inline form { display: flex; align-items: center; gap: 6px; }
+  .admin-table .tag { flex: 0 0 auto; }
+  .admin-table .muted { font-size: 12px; }
 }
 
 @media (max-width: 480px) {
   .container { padding: 14px 12px calc(50px + env(safe-area-inset-bottom)); }
-  .task-grid { grid-template-columns: 1fr; gap: 10px; }
-  .task-name { font-size: 15px; }
-  .task-value { font-size: 16px; }
   .redeem-grid { grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px; }
   .stat-row { grid-template-columns: 1fr 1fr; gap: 10px; }
   .chip { padding: 6px 12px; font-size: 13px; }
-  .strip-score { font-size: 14px; }
   .flashes { padding: 0 12px; }
   .week-nav, .month-nav { flex-wrap: wrap; }
   .week-nav .btn, .month-nav .btn { padding: 8px 13px; font-size: 13px; }

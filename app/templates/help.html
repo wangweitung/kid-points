@@ -28,7 +28,6 @@
 
   <nav class="guide-toc">
     <a href="#common">共用部分</a>
-    <a href="#page-today">今日打卡</a>
     <a href="#page-week">周视图</a>
     <a href="#page-month">月视图</a>
     <a href="#page-passbook">存折</a>
@@ -55,18 +54,7 @@
   </div>
 
   <div class="guide-page">
-    <h2 id="page-today">今日打卡（<code>/</code>，<code>today.html</code>）</h2>
-    <table class="data-table">
-      <tbody>
-        <tr><td>今日统计</td><td><code>#today-total</code> <code>#today-count</code>（打卡后自动更新）</td></tr>
-        <tr><td>任务卡片</td><td><code>.task-grid</code> 里的 <code>.task-card</code>；完成态 <code>.done</code>，勾选圈 <code>.task-check</code></td></tr>
-        <tr><td>近 7 天条</td><td><code>.strip</code> 里的 <code>.strip-day</code>；得分挂 <code>data-strip-total</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="guide-page">
-    <h2 id="page-week">周视图（<code>/week</code>，<code>week.html</code>）</h2>
+    <h2 id="page-week">周视图（首页 <code>/</code> 重定向到 <code>/week</code>，<code>week.html</code>）</h2>
     <table class="data-table">
       <tbody>
         <tr><td>周积分卡</td><td><code>.week-board</code>（行 <code>.wrow</code>，格 <code>.wc</code>）；打卡格 <code>.cell</code>（<code>.done</code> / <code>.future</code> / <code>.locked</code>，标记 <code>.cell-mark</code>）</td></tr>

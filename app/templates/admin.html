@@ -9,26 +9,28 @@
   <div class="card">
     <h2>开关</h2>
     <p class="muted">注册：关闭后登录页不再显示注册入口。补记：开启后可修改过去日期的打卡，关闭后只能改今天。</p>
-    <form method="post" action="{{ url_for('admin.registration') }}" class="inline-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {% if registration_open %}
-        <input type="hidden" name="open" value="0">
-        <button type="submit" class="btn btn-danger">注册已开启 · 点击关闭</button>
-      {% else %}
-        <input type="hidden" name="open" value="1">
-        <button type="submit" class="btn btn-primary">注册已关闭 · 点击开启</button>
-      {% endif %}
-    </form>
-    <form method="post" action="{{ url_for('admin.past_edit') }}" class="inline-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {% if past_edit %}
-        <input type="hidden" name="open" value="0">
-        <button type="submit" class="btn btn-danger">可修改过去 · 点击关闭</button>
-      {% else %}
-        <input type="hidden" name="open" value="1">
-        <button type="submit" class="btn btn-primary">不可修改过去 · 点击开启</button>
-      {% endif %}
-    </form>
+    <div class="switch-row">
+      <form method="post" action="{{ url_for('admin.registration') }}" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if registration_open %}
+          <input type="hidden" name="open" value="0">
+          <button type="submit" class="btn btn-danger">注册已开启 · 点击关闭</button>
+        {% else %}
+          <input type="hidden" name="open" value="1">
+          <button type="submit" class="btn btn-primary">注册已关闭 · 点击开启</button>
+        {% endif %}
+      </form>
+      <form method="post" action="{{ url_for('admin.past_edit') }}" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if past_edit %}
+          <input type="hidden" name="open" value="0">
+          <button type="submit" class="btn btn-danger">可修改过去 · 点击关闭</button>
+        {% else %}
+          <input type="hidden" name="open" value="1">
+          <button type="submit" class="btn btn-primary">不可修改过去 · 点击开启</button>
+        {% endif %}
+      </form>
+    </div>
   </div>
 
   <div class="card">

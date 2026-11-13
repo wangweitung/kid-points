@@ -61,6 +61,7 @@ def login():
             session["user_id"] = row["id"]
             session["username"] = row["username"]
             session["role"] = row["role"]
+            session["session_ver"] = row["session_ver"]
             return redirect(url_for("views.today"))
         flash("用户名或密码错误", "error")
         return render_template("login.html", username=username,

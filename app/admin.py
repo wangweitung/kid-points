@@ -10,7 +10,7 @@ from flask import (
 from werkzeug.security import generate_password_hash
 
 from .db import get_db, get_setting, set_setting
-from .helpers import admin_required, resync_all_daily
+from .helpers import admin_required, parse_amount, resync_all_daily
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -52,10 +52,7 @@ def past_edit():
 @admin_required
 def task_add():
     name = (request.form.get("name") or "").strip()
-    try:
-        value = float(request.form.get("value") or 0)
-    except ValueError:
-        value = 0
+    value = parse_amount(request.form.get("value"))
     if not name or value <= 0:
         flash("请填写任务名称和正数分值", "error")
     else:
@@ -75,10 +72,7 @@ def task_add():
 def task_update():
     task_id = request.form.get("id", type=int)
     name = (request.form.get("name") or "").strip()
-    try:
-        value = float(request.form.get("value") or 0)
-    except ValueError:
-        value = 0
+    value = parse_amount(request.form.get("value"))
     db = get_db()
     if not task_id or not name or value <= 0:
         flash("名称和分值必须有效", "error")
@@ -96,12 +90,16 @@ def task_update():
 @admin_required
 def task_toggle():
     db = get_db()
-    db.execute(
+    cur = db.execute(
         "UPDATE tasks SET active = 1 - active WHERE id = ?",
         (request.form.get("id", type=int) or -1,),
     )
-    db.commit()
-    flash("已更新任务状态", "ok")
+    if cur.rowcount:
+        resync_all_daily(db)
+        db.commit()
+        flash("已更新任务状态，历史每日得分已重算", "ok")
+    else:
+        flash("任务不存在", "error")
     return redirect(url_for("admin.panel"))
 
 
@@ -109,10 +107,7 @@ def task_toggle():
 @admin_required
 def child_add():
     name = (request.form.get("name") or "").strip()
-    try:
-        initial = float(request.form.get("initial_balance") or 0)
-    except ValueError:
-        initial = 0
+    initial = parse_amount(request.form.get("initial_balance"))
     if not name:
         flash("请填写小朋友姓名", "error")
     else:
@@ -130,10 +125,7 @@ def child_add():
 def child_update():
     child_id = request.form.get("id", type=int)
     name = (request.form.get("name") or "").strip()
-    try:
-        initial = float(request.form.get("initial_balance") or 0)
-    except ValueError:
-        initial = 0
+    initial = parse_amount(request.form.get("initial_balance"))
     active = 1 if request.form.get("active") == "1" else 0
     db = get_db()
     if not child_id or not name:
@@ -196,7 +188,7 @@ def user_password():
         flash("密码至少 4 位", "error")
     else:
         db.execute(
-            "UPDATE users SET password_hash = ? WHERE id = ?",
+            "UPDATE users SET password_hash = ?, session_ver = session_ver + 1 WHERE id = ?",
             (generate_password_hash(password), user_id),
         )
         db.commit()

@@ -1,4 +1,5 @@
 import calendar
+import sqlite3
 from datetime import date, timedelta
 
 from flask import (
@@ -20,6 +21,7 @@ from .helpers import (
     day_score,
     local_today,
     login_required,
+    parse_amount,
     parse_iso,
     settlement,
     sync_daily,
@@ -147,17 +149,21 @@ def tick():
         "SELECT id FROM checkins WHERE child_id = ? AND task_id = ? AND date = ?",
         (child_id, task_id, ds),
     ).fetchone()
-    if existing:
-        db.execute("DELETE FROM checkins WHERE id = ?", (existing["id"],))
-        done = False
-    else:
-        db.execute(
-            "INSERT INTO checkins(child_id, task_id, date, created_by) VALUES(?, ?, ?, ?)",
-            (child_id, task_id, ds, session["user_id"]),
-        )
-        done = True
-    sync_daily(db, child_id, d)
-    db.commit()
+    try:
+        if existing:
+            db.execute("DELETE FROM checkins WHERE id = ?", (existing["id"],))
+            done = False
+        else:
+            db.execute(
+                "INSERT INTO checkins(child_id, task_id, date, created_by) VALUES(?, ?, ?, ?)",
+                (child_id, task_id, ds, session["user_id"]),
+            )
+            done = True
+        sync_daily(db, child_id, d)
+        db.commit()
+    except sqlite3.IntegrityError:
+        db.rollback()
+        return jsonify(error="操作冲突，请刷新后重试"), 409
     return jsonify(done=done, **_tick_state(db, child_id, d))
 
 
@@ -297,7 +303,7 @@ def month():
         r["date"]: (int(r["cnt"]), float(r["total"]))
         for r in get_db().execute(
             """SELECT ck.date, COUNT(*) AS cnt, COALESCE(SUM(t.value), 0) AS total
-               FROM checkins ck JOIN tasks t ON t.id = ck.task_id
+               FROM checkins ck JOIN tasks t ON t.id = ck.task_id AND t.active = 1
                WHERE ck.child_id = ? AND ck.date BETWEEN ? AND ?
                GROUP BY ck.date""",
             (child["id"], first.isoformat(), last.isoformat()),
@@ -410,13 +416,12 @@ def passbook_add():
         return early
     reason = (request.form.get("reason") or "").strip()
     d = parse_iso(request.form.get("date")) or local_today()
-    try:
-        income = float(request.form.get("income") or 0)
-        expense = float(request.form.get("expense") or 0)
-    except ValueError:
-        income = expense = 0
+    income = parse_amount(request.form.get("income"))
+    expense = parse_amount(request.form.get("expense"))
     note = (request.form.get("note") or "").strip()
-    if not reason or (income <= 0 and expense <= 0) or income < 0 or expense < 0:
+    if d > local_today():
+        flash("不能选择未来的日期", "error")
+    elif not reason or (income <= 0 and expense <= 0) or income < 0 or expense < 0:
         flash("请填写事由，并在收入或支出中填写正数", "error")
     elif income > 0 and expense > 0:
         flash("收入和支出只能填一项", "error")
@@ -481,6 +486,11 @@ def redeem():
            ORDER BY date DESC, id DESC LIMIT 50""",
         (child["id"], first.isoformat()),
     ).fetchall()
+    month_spent = db.execute(
+        """SELECT COALESCE(SUM(expense), 0) AS s FROM ledger
+           WHERE child_id = ? AND source = 'redeem' AND date >= ?""",
+        (child["id"], first.isoformat()),
+    ).fetchone()["s"]
     balance = balance_of(child["id"])
     return render_template(
         "redeem.html",
@@ -489,7 +499,7 @@ def redeem():
         items=items,
         history=history,
         balance=balance,
-        month_redemptions=round(sum(h["expense"] for h in history), 2),
+        month_redemptions=round(month_spent, 2),
     )
 
 
@@ -506,16 +516,26 @@ def redeem_do():
     ).fetchone()
     if not item:
         flash("商品不存在", "error")
-    elif balance_of(child["id"]) < item["price"]:
-        flash("余额不足，先攒攒分吧", "error")
     else:
-        db.execute(
-            """INSERT INTO ledger(child_id, date, reason, expense, source, created_by)
-               VALUES(?, ?, ?, ?, 'redeem', ?)""",
-            (child["id"], local_today().isoformat(), item["name"], item["price"], session["user_id"]),
-        )
-        db.commit()
-        flash(f"已兑换「{item['name']}」，支出 {item['price']:g} 分", "ok")
+        # Take the write lock before the balance check so two concurrent
+        # requests cannot both pass the check and overspend.
+        if not db.in_transaction:
+            db.execute("BEGIN IMMEDIATE")
+        try:
+            if balance_of(child["id"]) < item["price"]:
+                db.rollback()
+                flash("余额不足，先攒攒分吧", "error")
+            else:
+                db.execute(
+                    """INSERT INTO ledger(child_id, date, reason, expense, source, created_by)
+                       VALUES(?, ?, ?, ?, 'redeem', ?)""",
+                    (child["id"], local_today().isoformat(), item["name"], item["price"], session["user_id"]),
+                )
+                db.commit()
+                flash(f"已兑换「{item['name']}」，支出 {item['price']:g} 分", "ok")
+        except sqlite3.IntegrityError:
+            db.rollback()
+            flash("操作冲突，请重试", "error")
     return redirect(url_for("views.redeem", child=child["id"]))
 
 
@@ -523,10 +543,7 @@ def redeem_do():
 @admin_required
 def catalog_add():
     name = (request.form.get("name") or "").strip()
-    try:
-        price = float(request.form.get("price") or 0)
-    except ValueError:
-        price = 0
+    price = parse_amount(request.form.get("price"))
     if not name or price <= 0:
         flash("请填写商品名称和正数价格", "error")
     else:
@@ -546,10 +563,7 @@ def catalog_add():
 def catalog_update():
     item_id = request.form.get("id", type=int)
     name = (request.form.get("name") or "").strip()
-    try:
-        price = float(request.form.get("price") or 0)
-    except ValueError:
-        price = 0
+    price = parse_amount(request.form.get("price"))
     db = get_db()
     if not item_id or not name or price <= 0:
         flash("名称和价格必须有效", "error")
@@ -567,9 +581,11 @@ def catalog_update():
 @admin_required
 def catalog_delete():
     db = get_db()
-    db.execute("DELETE FROM catalog WHERE id = ?", (request.form.get("id", type=int) or -1,))
+    cur = db.execute(
+        "DELETE FROM catalog WHERE id = ?", (request.form.get("id", type=int) or -1,)
+    )
     db.commit()
-    flash("已删除", "ok")
+    flash("已删除" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
     return redirect(url_for("views.redeem"))
 
 
@@ -601,8 +617,10 @@ def _month_data(db, child, y: int, m: int) -> dict:
     checkins = {
         r["date"]: r["c"]
         for r in db.execute(
-            """SELECT date, COUNT(*) AS c FROM checkins
-               WHERE child_id = ? AND date BETWEEN ? AND ? GROUP BY date""",
+            """SELECT ck.date AS date, COUNT(*) AS c FROM checkins ck
+               JOIN tasks t ON t.id = ck.task_id AND t.active = 1
+               WHERE ck.child_id = ? AND ck.date BETWEEN ? AND ?
+               GROUP BY ck.date""",
             (child["id"], iso_first, iso_last),
         )
     }
@@ -632,7 +650,7 @@ def _month_data(db, child, y: int, m: int) -> dict:
         {"label": r["name"], "value": r["c"]}
         for r in db.execute(
             """SELECT t.name AS name, COUNT(*) AS c FROM checkins ck
-               JOIN tasks t ON t.id = ck.task_id
+               JOIN tasks t ON t.id = ck.task_id AND t.active = 1
                WHERE ck.child_id = ? AND ck.date BETWEEN ? AND ?
                GROUP BY t.id ORDER BY c DESC""",
             (child["id"], iso_first, iso_last),

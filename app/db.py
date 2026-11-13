@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'user',
+    session_ver INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
@@ -132,6 +133,11 @@ def get_db() -> sqlite3.Connection:
 def ensure_schema():
     db = get_db()
     db.executescript(SCHEMA)
+    cols = {r["name"] for r in db.execute("PRAGMA table_info(users)")}
+    if "session_ver" not in cols:
+        db.execute(
+            "ALTER TABLE users ADD COLUMN session_ver INTEGER NOT NULL DEFAULT 0"
+        )
     if db.execute("SELECT COUNT(*) AS c FROM tasks").fetchone()["c"] == 0:
         for i, (name, value) in enumerate(SEED_TASKS):
             db.execute(

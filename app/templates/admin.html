@@ -69,7 +69,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ t['id'] }}">
             <input type="text" name="name" value="{{ t['name'] }}" class="w-320" title="任务名">
-            <input type="number" name="value" value="{{ t['value']|int if t['value'] == t['value|int'] else t['value'] }}" min="0.5" step="0.5" class="w-90" title="分值">
+            <input type="number" name="value" value="{{ t['value']|int if t['value'] == t['value']|int else t['value'] }}" min="0.5" step="0.5" class="w-90" title="分值">
             <button type="submit" class="btn btn-small">保存</button>
           </form>
           <form method="post" action="{{ url_for('admin.task_toggle') }}" class="inline">

@@ -71,7 +71,7 @@
           <form method="post" action="{{ url_for('views.catalog_update') }}" class="inline-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ item['id'] }}">
-            <input type="number" name="price" value="{{ item['price']|int if item['price'] == item['price|int'] else item['price'] }}" min="1" step="1" class="w-90" title="分值">
+            <input type="number" name="price" value="{{ item['price']|int if item['price'] == item['price']|int else item['price'] }}" min="1" step="1" class="w-90" title="分值">
             <input type="text" name="name" value="{{ item['name'] }}" class="w-240" title="名称">
             <button type="submit" class="btn btn-small">保存</button>
           </form>

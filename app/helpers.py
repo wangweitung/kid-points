@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta, timezone
 from functools import wraps
+import math
 
-from flask import flash, redirect, request, session, url_for
+from flask import flash, g, redirect, request, session, url_for
 
 from .db import get_db
 
@@ -13,10 +14,44 @@ def local_today() -> date:
     return datetime.now(APP_TZ).date()
 
 
+def parse_amount(value, default: float = 0.0) -> float:
+    """Parse a form value into a finite float; NaN/Inf/invalid fall back to default."""
+    try:
+        f = float(value or default)
+    except (TypeError, ValueError):
+        return default
+    return f if math.isfinite(f) else default
+
+
+def session_user():
+    """Validate the session against the DB; refresh role, invalidate stale sessions.
+
+    Returns the users row, or None when logged out / deleted / password-reset.
+    Cached per request in g.
+    """
+    if hasattr(g, "_session_user"):
+        return g._session_user
+    user = None
+    uid = session.get("user_id")
+    if uid is not None:
+        row = get_db().execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
+        if row is None:
+            session.clear()
+            flash("账号已不存在，请重新登录", "error")
+        elif session.get("session_ver") != row["session_ver"]:
+            session.clear()
+            flash("登录已失效，请重新登录", "error")
+        else:
+            session["role"] = row["role"]
+            user = row
+    g._session_user = user
+    return user
+
+
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if "user_id" not in session:
+        if session_user() is None:
             return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
 
@@ -26,9 +61,10 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if "user_id" not in session:
+        user = session_user()
+        if user is None:
             return redirect(url_for("auth.login"))
-        if session.get("role") != "admin":
+        if user["role"] != "admin":
             flash("该操作需要管理员权限", "error")
             return redirect(url_for("views.today"))
         return f(*args, **kwargs)
@@ -76,7 +112,7 @@ def day_score(db, child_id, d: date):
     row = db.execute(
         """SELECT COUNT(*) AS cnt, COALESCE(SUM(t.value), 0) AS total
            FROM checkins ck
-           JOIN tasks t ON t.id = ck.task_id
+           JOIN tasks t ON t.id = ck.task_id AND t.active = 1
            WHERE ck.child_id = ? AND ck.date = ?""",
         (child_id, d.isoformat()),
     ).fetchone()
@@ -116,6 +152,7 @@ def resync_all_daily(db):
 
 
 def settlement(db, child_id, mon: date, sun: date) -> dict:
+    """Week settlement scoped to the given week, so past weeks stay correct."""
     row = db.execute(
         """SELECT COALESCE(SUM(income), 0) AS inc, COALESCE(SUM(expense), 0) AS exp
            FROM ledger
@@ -124,12 +161,19 @@ def settlement(db, child_id, mon: date, sun: date) -> dict:
     ).fetchone()
     earned = float(row["inc"])
     spent = float(row["exp"])
-    now = balance_of(child_id)
-    opening = round(now - earned + spent, 2)
+    base = db.execute(
+        """SELECT c.initial_balance + COALESCE(
+               (SELECT SUM(income - expense) FROM ledger l
+                WHERE l.child_id = c.id AND l.date < ?), 0
+           ) AS bal
+           FROM children c WHERE c.id = ?""",
+        (mon.isoformat(), child_id),
+    ).fetchone()
+    opening = round(float(base["bal"]), 2) if base else 0.0
     return {
         "opening": opening,
         "earned": round(earned, 2),
         "available": round(opening + earned, 2),
         "spent": round(spent, 2),
-        "carry": now,
+        "carry": round(opening + earned - spent, 2),
     }

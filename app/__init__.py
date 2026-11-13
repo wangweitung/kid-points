@@ -1,3 +1,4 @@
+import math
 import secrets
 from pathlib import Path
 
@@ -5,6 +6,7 @@ from flask import Flask, flash, redirect, request, session, url_for
 from flask_wtf import CSRFProtect
 
 from . import db
+from .helpers import session_user
 
 csrf = CSRFProtect()
 
@@ -27,6 +29,8 @@ def _fmt_filter(value):
     try:
         f = float(value)
     except (TypeError, ValueError):
+        return value
+    if not math.isfinite(f):
         return value
     if f == int(f):
         return f"{int(f):,}"
@@ -70,13 +74,13 @@ def create_app() -> Flask:
         if ep == "auth.setup":
             return redirect(url_for("auth.login"))
         if ep in ("auth.login", "auth.register"):
-            if "user_id" in session:
+            if session_user() is not None:
                 return redirect(url_for("views.today"))
             if ep == "auth.register" and db.get_setting("registration_open") != "1":
                 flash("注册已关闭，请联系管理员", "error")
                 return redirect(url_for("auth.login"))
             return
-        if "user_id" not in session:
+        if session_user() is None:
             return redirect(url_for("auth.login"))
 
     with app.app_context():

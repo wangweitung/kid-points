@@ -51,7 +51,7 @@
         {% endif %}
       </tr>
       {% else %}
-      <tr><td colspan="8" class="muted center">本月还没有记录</td></tr>
+      <tr><td colspan="{{ 8 if session.get('role') == 'admin' else 7 }}" class="muted center">本月还没有记录</td></tr>
       {% endfor %}
     </tbody>
     <tfoot>
@@ -60,7 +60,7 @@
         <td class="num income">{{ total_income|fmt }}</td>
         <td class="num expense">{{ total_expense|fmt }}</td>
         <td class="num">{{ balance|fmt }}</td>
-        <td colspan="3"></td>
+        <td colspan="{{ 3 if session.get('role') == 'admin' else 2 }}"></td>
       </tr>
     </tfoot>
   </table>

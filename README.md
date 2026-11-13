@@ -120,5 +120,5 @@ $env:DATA_DIR = "data"
     ├── views.py             # 打卡、周视图、月视图、存折、兑换、图表
     ├── admin.py             # 管理页
     ├── templates/           # Jinja2 模板（narrow.html 为登录类窄版布局）
-    └── static/              # 样式、交互脚本、内置 Chart.js
+    └── static/              # 样式、交互脚本、favicon、内置 Chart.js
 ```

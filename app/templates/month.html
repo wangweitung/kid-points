@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ year }} 年 {{ month }} 月月视图 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ year }} 年 {{ month }} 月月视图</h1>
+    <p class="muted">{{ today_d.isoformat() }} · 点某一天进入该周积分卡</p>
+  </div>
+  <div class="chips">
+    <span class="chip chip-balance">余额 <b>{{ balance|fmt }}</b> 分</span>
+    <span class="chip chip-score">本月得分 <b>{{ month_score|fmt }}</b> 分</span>
+    <span class="chip">打卡 <b>{{ days_tracked }}</b> 天 · <b>{{ total_checkins }}</b> 次</span>
+  </div>
+</div>
+
+<div class="month-nav">
+  <a class="btn btn-ghost" href="{{ url_for('views.month', child=child['id'], **prev_query) }}">← 上月</a>
+  <span class="month-label">{{ year }}-{{ '%02d'|format(month) }}</span>
+  <a class="btn btn-ghost" href="{{ url_for('views.month', child=child['id'], year=today_d.year, month=today_d.month) }}">本月</a>
+  <a class="btn btn-ghost" href="{{ url_for('views.month', child=child['id'], **next_query) }}">下月 →</a>
+</div>
+
+<div class="card cal-card">
+  <div class="cal-grid">
+    {% for w in ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] %}
+    <div class="cal-head">{{ w }}</div>
+    {% endfor %}
+    {% for week in weeks %}
+      {% for d in week %}
+        {% if d %}
+        <a class="cal-cell{% if d['today'] %} today{% endif %}{% if d['future'] %} future{% endif %}{% if d['count'] %} has-score{% endif %}"
+           href="{{ url_for('views.week', date=d['iso'], child=child['id']) }}">
+          <span class="cal-daynum">{{ d['day'] }}</span>
+          <span class="cal-score">{{ d['score']|fmt if d['count'] else '' }}</span>
+        </a>
+        {% else %}
+        <span class="cal-cell blank" aria-hidden="true"></span>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+<p class="muted">格子里是当天得分；没有分数表示当天没打卡。灰色为未来日期。</p>
+{% endblock %}

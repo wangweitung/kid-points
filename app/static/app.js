@@ -44,6 +44,8 @@ async function doTick(el) {
 
 function applyTick(el, data) {
   el.classList.toggle('done', !!data.done);
+  // week table cell: keep the check mark in sync without a page refresh
+  if (el.classList.contains('cell')) el.textContent = data.done ? '✓' : '';
 
   setText('today-total', fmtNum(data.today_total));
   setText('today-count', String(data.today_count));

@@ -274,6 +274,74 @@ def week_note():
     return redirect(url_for("views.week"))
 
 
+@bp.get("/month")
+def month():
+    child, early, children = _need_child()
+    if early:
+        return early
+    now = local_today()
+    y = request.args.get("year", type=int) or now.year
+    m = request.args.get("month", type=int) or now.month
+    try:
+        first = date(y, m, 1)
+    except ValueError:
+        first = date(now.year, now.month, 1)
+        y, m = first.year, first.month
+
+    last_day = calendar.monthrange(y, m)[1]
+    first, last = date(y, m, 1), date(y, m, last_day)
+    by_date = {
+        r["date"]: (int(r["cnt"]), float(r["total"]))
+        for r in get_db().execute(
+            """SELECT ck.date, COUNT(*) AS cnt, COALESCE(SUM(t.value), 0) AS total
+               FROM checkins ck JOIN tasks t ON t.id = ck.task_id
+               WHERE ck.child_id = ? AND ck.date BETWEEN ? AND ?
+               GROUP BY ck.date""",
+            (child["id"], first.isoformat(), last.isoformat()),
+        )
+    }
+    scores, counts = [], []
+    for i in range(1, last_day + 1):
+        cnt, total = by_date.get(date(y, m, i).isoformat(), (0, 0.0))
+        counts.append(cnt)
+        scores.append(total)
+
+    cells = [None] * first.weekday()
+    for i in range(1, last_day + 1):
+        d = date(y, m, i)
+        cells.append(
+            {
+                "day": i,
+                "iso": d.isoformat(),
+                "score": scores[i - 1],
+                "count": counts[i - 1],
+                "today": d == now,
+                "future": d > now,
+            }
+        )
+    while len(cells) % 7:
+        cells.append(None)
+    weeks = [cells[i : i + 7] for i in range(0, len(cells), 7)]
+
+    pm, py = (12, y - 1) if m == 1 else (m - 1, y)
+    nm, ny = (1, y + 1) if m == 12 else (m + 1, y)
+    return render_template(
+        "month.html",
+        child=child,
+        children=children,
+        year=y,
+        month=m,
+        weeks=weeks,
+        today_d=now,
+        prev_query={"year": py, "month": pm},
+        next_query={"year": ny, "month": nm},
+        balance=balance_of(child["id"]),
+        month_score=round(sum(scores), 2),
+        days_tracked=sum(1 for c in counts if c),
+        total_checkins=sum(counts),
+    )
+
+
 @bp.get("/passbook")
 def passbook():
     child, early, children = _need_child()

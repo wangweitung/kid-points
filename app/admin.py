@@ -25,6 +25,7 @@ def panel():
         children=db.execute("SELECT * FROM children ORDER BY id").fetchall(),
         users=db.execute("SELECT * FROM users ORDER BY id").fetchall(),
         registration_open=get_setting("registration_open") == "1",
+        past_edit=get_setting("allow_past_edit", "0") == "1",
         today_label=None,
     )
 
@@ -35,6 +36,15 @@ def registration():
     open_now = request.form.get("open") == "1"
     set_setting("registration_open", "1" if open_now else "0")
     flash("注册已开启" if open_now else "注册已关闭", "ok")
+    return redirect(url_for("admin.panel"))
+
+
+@bp.post("/past-edit")
+@admin_required
+def past_edit():
+    allow = request.form.get("open") == "1"
+    set_setting("allow_past_edit", "1" if allow else "0")
+    flash("现在可以修改过去的日期" if allow else "已禁止修改过去的日期", "ok")
     return redirect(url_for("admin.panel"))
 
 

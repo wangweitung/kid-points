@@ -12,7 +12,7 @@ from flask import (
     url_for,
 )
 
-from .db import get_db
+from .db import get_db, get_setting
 from .helpers import (
     admin_required,
     balance_of,
@@ -131,6 +131,8 @@ def tick():
         return jsonify(error="参数错误"), 400
     if d > local_today():
         return jsonify(error="不能为未来的日期打卡"), 400
+    if d < local_today() and get_setting("allow_past_edit", "0") != "1":
+        return jsonify(error="不能修改过去的日期，如需补记请管理员在管理页开启"), 400
     db = get_db()
     child = db.execute(
         "SELECT id FROM children WHERE id = ? AND active = 1", (child_id,)
@@ -227,6 +229,7 @@ def week():
         task_rows=task_rows,
         days=days,
         today_d=today_d,
+        past_edit=get_setting("allow_past_edit", "0") == "1",
         weekday_names=WEEKDAY_NAMES,
         day_totals=day_totals,
         day_counts=day_counts,

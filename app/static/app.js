@@ -13,7 +13,7 @@ function setText(id, text) {
 }
 
 async function doTick(el) {
-  if (el.classList.contains('busy') || el.classList.contains('future')) return;
+  if (el.classList.contains('busy') || el.classList.contains('future') || el.classList.contains('locked')) return;
   el.classList.add('busy');
   try {
     const resp = await fetch('/tick', {

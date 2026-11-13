@@ -305,9 +305,10 @@ table { border-collapse: collapse; width: 100%; }
   color: transparent;
   border-radius: 8px;
 }
-.cell:hover:not(.future) { background: rgba(42, 120, 214, 0.1); }
+.cell:hover:not(.future):not(.locked) { background: rgba(42, 120, 214, 0.1); }
 .cell.done { background: var(--good); color: #fff; }
 .cell.future { cursor: default; background: rgba(11, 11, 11, 0.03); }
+.cell.locked { cursor: default; }
 .cell.busy { opacity: 0.6; pointer-events: none; }
 .row-total td { background: rgba(11, 11, 11, 0.03); font-weight: 700; border-top: 2px solid var(--grid); }
 

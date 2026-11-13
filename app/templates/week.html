@@ -41,8 +41,9 @@
         <td class="col-value">{{ row.task['value']|fmt }}</td>
         {% for i in range(7) %}
           {% set d = days[i] %}
-          <td class="cell{% if row.checked[i] %} done{% endif %}{% if d > today_d %} future{% endif %}"
-              {% if d <= today_d %}data-tick data-child="{{ child['id'] }}" data-task="{{ row.task['id'] }}" data-date="{{ d.isoformat() }}"{% endif %}>{% if row.checked[i] %}✓{% endif %}</td>
+          {% set locked = d < today_d and not past_edit %}
+          <td class="cell{% if row.checked[i] %} done{% endif %}{% if d > today_d %} future{% endif %}{% if locked %} locked{% endif %}"
+              {% if d <= today_d and not locked %}data-tick data-child="{{ child['id'] }}" data-task="{{ row.task['id'] }}" data-date="{{ d.isoformat() }}"{% endif %}>{% if row.checked[i] %}✓{% endif %}</td>
         {% endfor %}
         <td class="num col-sum" data-task-score="{{ row.task['id'] }}">{{ row.score|fmt if row.score is not none else '' }}</td>
         <td class="num col-sum" data-task-days="{{ row.task['id'] }}">{{ row.days }}</td>

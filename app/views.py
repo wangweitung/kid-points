@@ -18,6 +18,7 @@ from .helpers import (
     balance_of,
     current_child,
     day_score,
+    local_today,
     login_required,
     parse_iso,
     settlement,
@@ -46,7 +47,7 @@ def today():
     tasks = db.execute(
         "SELECT * FROM tasks WHERE active = 1 ORDER BY sort_order, id"
     ).fetchall()
-    today_d = date.today()
+    today_d = local_today()
     done_ids = {
         r["task_id"]
         for r in db.execute(
@@ -104,7 +105,7 @@ def _tick_state(db, child_id, d: date) -> dict:
         cnt, total = day_score(db, child_id, dd)
         day_totals[dd.isoformat()] = total
         day_counts[dd.isoformat()] = cnt
-    t_cnt, t_total = day_score(db, child_id, date.today())
+    t_cnt, t_total = day_score(db, child_id, local_today())
     return {
         "date": d.isoformat(),
         "day_total": day_totals[d.isoformat()],
@@ -128,7 +129,7 @@ def tick():
     d = parse_iso(payload.get("date"))
     if not isinstance(child_id, int) or not isinstance(task_id, int) or d is None:
         return jsonify(error="参数错误"), 400
-    if d > date.today():
+    if d > local_today():
         return jsonify(error="不能为未来的日期打卡"), 400
     db = get_db()
     child = db.execute(
@@ -163,10 +164,10 @@ def week():
     child, early, children = _need_child()
     if early:
         return early
-    d = parse_iso(request.args.get("date")) or date.today()
+    d = parse_iso(request.args.get("date")) or local_today()
     mon, sun = week_bounds(d)
     db = get_db()
-    today_d = date.today()
+    today_d = local_today()
     days = [mon + timedelta(days=i) for i in range(7)]
 
     tasks = db.execute(
@@ -278,7 +279,7 @@ def passbook():
     child, early, children = _need_child()
     if early:
         return early
-    now = date.today()
+    now = local_today()
     y = request.args.get("year", type=int) or now.year
     m = request.args.get("month", type=int) or now.month
     try:
@@ -337,7 +338,7 @@ def passbook_add():
     if early:
         return early
     reason = (request.form.get("reason") or "").strip()
-    d = parse_iso(request.form.get("date")) or date.today()
+    d = parse_iso(request.form.get("date")) or local_today()
     try:
         income = float(request.form.get("income") or 0)
         expense = float(request.form.get("expense") or 0)
@@ -386,8 +387,8 @@ def passbook_delete():
         url_for(
             "views.passbook",
             child=row["child_id"] if row else None,
-            year=(parse_iso(row["date"]).year if row else date.today().year),
-            month=(parse_iso(row["date"]).month if row else date.today().month),
+            year=(parse_iso(row["date"]).year if row else local_today().year),
+            month=(parse_iso(row["date"]).month if row else local_today().month),
         )
     )
 
@@ -401,7 +402,7 @@ def redeem():
     items = db.execute(
         "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
     ).fetchall()
-    now = date.today()
+    now = local_today()
     first = date(now.year, now.month, 1)
     history = db.execute(
         """SELECT * FROM ledger
@@ -440,7 +441,7 @@ def redeem_do():
         db.execute(
             """INSERT INTO ledger(child_id, date, reason, expense, source, created_by)
                VALUES(?, ?, ?, ?, 'redeem', ?)""",
-            (child["id"], date.today().isoformat(), item["name"], item["price"], session["user_id"]),
+            (child["id"], local_today().isoformat(), item["name"], item["price"], session["user_id"]),
         )
         db.commit()
         flash(f"已兑换「{item['name']}」，支出 {item['price']:g} 分", "ok")
@@ -597,7 +598,7 @@ def charts():
     child, early, children = _need_child()
     if early:
         return early
-    now = date.today()
+    now = local_today()
     y = request.args.get("year", type=int) or now.year
     m = request.args.get("month", type=int) or now.month
     try:

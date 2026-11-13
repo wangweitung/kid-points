@@ -24,7 +24,12 @@
       <tr>
         <th class="col-task">做什么</th>
         <th class="col-value">分值</th>
-        {% for w in weekday_names %}<th class="col-day">{{ w }}</th>{% endfor %}
+        {% for i in range(7) %}
+        <th class="col-day{% if days[i] == today_d %} today{% endif %}">
+          <span class="col-day-date">{{ days[i].strftime('%m-%d') }}</span>
+          <span class="col-day-name">{{ weekday_names[i] }}</span>
+        </th>
+        {% endfor %}
         <th class="col-sum">本周得分</th>
         <th class="col-sum">完成天数</th>
       </tr>

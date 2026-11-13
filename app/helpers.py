@@ -1,9 +1,16 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from functools import wraps
 
 from flask import flash, redirect, request, session, url_for
 
 from .db import get_db
+
+# All business dates must be Beijing time, independent of server/container TZ.
+APP_TZ = timezone(timedelta(hours=8))
+
+
+def local_today() -> date:
+    return datetime.now(APP_TZ).date()
 
 
 def login_required(f):

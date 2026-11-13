@@ -284,6 +284,16 @@ table { border-collapse: collapse; width: 100%; }
   font-size: 13px;
   background: rgba(11, 11, 11, 0.02);
 }
+.col-day-date {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.col-day-name { display: block; font-weight: 600; }
+.col-day.today .col-day-date { color: var(--primary); }
+.col-day.today .col-day-name { color: var(--primary); }
 .week-table .num { text-align: right; padding-right: 12px; }
 .cell {
   width: 46px;

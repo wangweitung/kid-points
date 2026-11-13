@@ -436,7 +436,39 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 860px) {
   .week-cols, .chart-grid { grid-template-columns: 1fr; }
   .container { padding: 16px 12px 50px; }
-  .topbar { padding: 8px 12px; gap: 8px; }
   .strip { gap: 4px; }
   .strip-day { padding: 6px 2px; }
+
+  /* topbar: brand + userbox on one row, nav scrolls on its own row */
+  .topbar {
+    padding: 8px 12px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .userbox { flex: 0 0 auto; }
+  .who { display: none; }
+  .nav {
+    order: 3;
+    flex: 0 0 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -12px;
+    padding: 6px 12px 0;
+    border-top: 1px solid var(--border);
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 7px 12px;
+  }
 }

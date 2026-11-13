@@ -36,7 +36,8 @@
     <div class="strip-day{% if s.is_today %} today{% endif %}">
       <div class="strip-label">{{ s.wday }}</div>
       <div class="strip-date">{{ s.date.strftime('%m-%d') }}</div>
-      <div class="strip-score{% if s.count %} has-score{% endif %}">{{ s.total|fmt if s.count else '—' }}</div>
+      <div class="strip-score{% if s.count %} has-score{% endif %}"
+           data-strip-total="{{ s.date.isoformat() }}">{{ s.total|fmt if s.count else '—' }}</div>
     </div>
   {% endfor %}
 </div>

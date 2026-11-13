@@ -53,6 +53,12 @@ function applyTick(el, data) {
     const v = data.day_totals[node.dataset.dayTotal];
     node.textContent = v ? fmtNum(v) : '';
   });
+  document.querySelectorAll('[data-strip-total]').forEach(function (node) {
+    const v = data.day_totals[node.dataset.stripTotal];
+    if (v === undefined) return; // strip 跨周，不在本周数据里的日期保持原样
+    node.textContent = v ? fmtNum(v) : '—';
+    node.classList.toggle('has-score', !!v);
+  });
   document.querySelectorAll('[data-task-score]').forEach(function (node) {
     const info = data.task_week[node.dataset.taskScore];
     if (info) node.textContent = info.days ? fmtNum(info.score) : '';

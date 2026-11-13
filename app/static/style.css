@@ -15,6 +15,7 @@
   --danger: #dc4b4b;
   --amber: #eda100;
   --radius: 14px;
+  --gap: clamp(14px, 2.2vw, 18px);
   --shadow-sm: 0 1px 3px rgba(28, 30, 38, 0.06), 0 1px 2px rgba(28, 30, 38, 0.04);
   --shadow-md: 0 4px 16px rgba(28, 30, 38, 0.08);
   --shadow-lg: 0 12px 40px rgba(28, 30, 38, 0.1);
@@ -31,11 +32,11 @@ body {
   background-attachment: fixed;
   color: var(--ink);
   font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-  font-size: 15px;
+  font-size: clamp(14px, 2.6vw, 15px);
   line-height: 1.6;
 }
 
-h1 { font-size: 24px; margin: 0; letter-spacing: 0.5px; }
+h1 { font-size: clamp(20px, 4.5vw, 24px); margin: 0; letter-spacing: 0.5px; }
 h2 { font-size: 16px; margin: 0 0 12px; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -103,7 +104,7 @@ a:hover { text-decoration: underline; }
   align-items: flex-start;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .page-head .muted { margin: 4px 0 0; }
 
@@ -126,7 +127,7 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 20px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
   box-shadow: var(--shadow-sm);
 }
 
@@ -183,9 +184,9 @@ a:hover { text-decoration: underline; }
 /* ---------- today ---------- */
 .task-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .task-card {
   display: flex;
@@ -231,7 +232,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .strip-day {
   background: var(--surface);
@@ -254,7 +255,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .month-label { font-weight: 600; min-width: 90px; text-align: center; }
 
@@ -283,7 +284,7 @@ table { border-collapse: collapse; width: 100%; }
 /* week board: grid layout, no horizontal scroll on mobile */
 .week-board {
   display: grid;
-  grid-template-columns: minmax(140px, 1.5fr) 52px repeat(7, minmax(44px, 1fr)) 60px 68px;
+  grid-template-columns: minmax(9em, 1.5fr) 3.4em repeat(7, minmax(2.75em, 1fr)) 3.75em 4.25em;
   align-items: center;
   padding: 4px 14px 8px;
   overflow: visible;
@@ -391,8 +392,8 @@ table { border-collapse: collapse; width: 100%; }
 .week-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
 }
 .week-cols .card { margin-bottom: 0; }
 .settle dl { margin: 0; }
@@ -422,9 +423,9 @@ table { border-collapse: collapse; width: 100%; }
 /* ---------- redeem ---------- */
 .redeem-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .redeem-card {
   text-align: center;
@@ -434,16 +435,16 @@ table { border-collapse: collapse; width: 100%; }
 .redeem-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .redeem-card.poor { opacity: 0.7; }
 .redeem-card.poor:hover { transform: none; box-shadow: var(--shadow-sm); }
-.redeem-price { font-size: 30px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
+.redeem-price { font-size: clamp(22px, 7vw, 30px); font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
 .redeem-price small { font-size: 14px; color: var(--muted); font-weight: 500; }
 .redeem-name { font-weight: 600; margin: 4px 0 12px; }
 
 /* ---------- stats & charts ---------- */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: var(--gap);
 }
 .stat-tile {
   background: var(--surface);
@@ -457,26 +458,26 @@ table { border-collapse: collapse; width: 100%; }
   box-shadow: var(--shadow-sm);
 }
 .stat-label { width: 100%; font-size: 13px; color: var(--muted); }
-.stat-value { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stat-value { font-size: clamp(22px, 7vw, 30px); font-weight: 800; font-variant-numeric: tabular-nums; }
 .stat-unit { font-size: 13px; color: var(--muted); }
 
 .chart-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
 }
 .chart-card { margin-bottom: 0; }
-.chart-box { position: relative; height: 260px; }
-.chart-box-tall { height: 300px; }
+.chart-box { position: relative; height: clamp(220px, 42vw, 260px); }
+.chart-box-tall { height: clamp(240px, 48vw, 300px); }
 .table-view summary { cursor: pointer; font-weight: 600; color: var(--ink-2); }
 
 /* ---------- admin ---------- */
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 18px;
-  margin-bottom: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--gap);
+  margin-bottom: var(--gap);
 }
 .admin-grid .card { margin-bottom: 0; }
 .inline { display: inline; }
@@ -507,10 +508,10 @@ input:focus, select:focus, textarea:focus {
   outline: 2px solid rgba(42, 120, 214, 0.4);
   outline-offset: 1px;
 }
-.w-90 { width: 90px; }
-.w-140 { width: 140px; }
-.w-240 { width: 240px; max-width: 100%; }
-.w-320 { width: 320px; max-width: 100%; }
+.w-90 { width: min(90px, 100%); }
+.w-140 { width: min(140px, 100%); }
+.w-240 { width: min(240px, 100%); }
+.w-320 { width: min(320px, 100%); }
 
 .tag {
   display: inline-block;
@@ -588,7 +589,7 @@ code {
   }
   .strip-day {
     padding: 4px 2px;
-    min-height: 52px;
+    min-height: clamp(46px, 12vw, 52px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -597,7 +598,7 @@ code {
   }
   .cal-card { padding: 10px 8px; }
   .cal-grid { gap: 4px; }
-  .cal-cell { min-height: 50px; padding: 4px; border-radius: 6px; }
+  .cal-cell { min-height: clamp(44px, 11vw, 50px); padding: 4px; border-radius: 6px; }
   .cal-daynum { font-size: 11px; }
   .cal-score { font-size: 13px; }
 
@@ -674,7 +675,7 @@ code {
   .wc.cell {
     flex: 1 1 0;
     min-width: 0;
-    min-height: 48px;
+    min-height: clamp(44px, 12vw, 48px);
     height: auto;
     padding: 4px;
     border-radius: 6px;
@@ -811,19 +812,14 @@ code {
 }
 
 @media (max-width: 480px) {
-  body { font-size: 14px; }
-  h1 { font-size: 20px; }
   .container { padding: 14px 12px calc(50px + env(safe-area-inset-bottom)); }
   .task-grid { grid-template-columns: 1fr; gap: 10px; }
   .task-name { font-size: 15px; }
   .task-value { font-size: 16px; }
-  .redeem-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .redeem-price { font-size: 24px; }
+  .redeem-grid { grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px; }
   .stat-row { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .stat-value { font-size: 24px; }
   .chip { padding: 5px 12px; font-size: 13px; }
   .strip-score { font-size: 14px; }
-  .cal-cell { min-height: 44px; }
   .flashes { padding: 0 12px; }
   .week-nav, .month-nav { flex-wrap: wrap; }
   .week-nav .btn, .month-nav .btn { padding: 8px 12px; font-size: 13px; }

@@ -155,7 +155,7 @@
     <thead><tr><th>文件</th><th>管什么</th></tr></thead>
     <tbody>
       <tr><td><code>app/templates/*.html</code></td><td>每个页面的结构和文案；<code>base.html</code> 是共用骨架</td></tr>
-      <tr><td><code>app/static/style.css</code></td><td>全部外观：颜色变量在最上面 <code>:root</code>，各区域按注释分节，手机端在底部两个 <code>@media</code> 块</td></tr>
+      <tr><td><code>app/static/style.css</code></td><td>全部外观：<code>:root</code> 里是颜色和间距变量（间距用 <code>--gap</code> 弹性值，字号、图表高度用 <code>clamp()</code> 随屏宽缩放），各区域按注释分节，手机端在底部几个 <code>@media</code> 块</td></tr>
       <tr><td><code>app/static/app.js</code></td><td>打卡 <code>doTick/applyTick</code>、切小朋友、手机菜单开关</td></tr>
       <tr><td><code>app/views.py</code></td><td>每个页面的路由和数据</td></tr>
     </tbody>

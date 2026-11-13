@@ -577,8 +577,24 @@ code {
 @media (max-width: 860px) {
   .week-cols, .chart-grid { grid-template-columns: 1fr; }
   .container { padding: 16px 12px 50px; }
-  .strip { gap: 4px; }
-  .strip-day { padding: 6px 2px; }
+  /* strip: month-calendar style card */
+  .strip {
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 8px;
+    box-shadow: var(--shadow-sm);
+  }
+  .strip-day {
+    padding: 4px 2px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    border-radius: 6px;
+  }
   .cal-card { padding: 10px 8px; }
   .cal-grid { gap: 4px; }
   .cal-cell { min-height: 50px; padding: 4px; border-radius: 6px; }
@@ -630,14 +646,14 @@ code {
   .nav a.active { box-shadow: none; }
   .task-card { padding: 15px 14px; }
 
-  /* week board: card-style rows, no horizontal scrolling */
-  .week-board { display: block; padding: 2px 14px 8px; }
+  /* week board: month-calendar style, no horizontal scrolling */
+  .week-board { display: block; padding: 10px 8px; }
   .wrow {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 2px 8px;
-    padding: 10px 0;
+    padding: 9px 0;
     border-bottom: 1px solid var(--grid);
   }
   .wrow-head { display: none; }
@@ -649,22 +665,40 @@ code {
   .wc-daystrip { flex: 0 0 100%; display: flex; gap: 4px; margin-top: 6px; }
   .wc-day-date {
     display: block;
+    align-self: flex-start;
     font-size: 10px;
     color: var(--muted);
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
   }
-  .wc.cell { flex: 1 1 0; min-width: 0; height: 44px; }
+  .wc.cell {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 48px;
+    height: auto;
+    padding: 4px;
+    border-radius: 6px;
+    align-items: flex-start;
+  }
+  .wc.cell .cell-mark { margin: auto; font-size: 15px; }
   .wc.cell.done .wc-day-date { color: rgba(255, 255, 255, 0.85); }
   .wrow-total {
-    background: rgba(28, 30, 38, 0.03);
-    margin: 4px -14px -8px;
-    padding: 10px 14px;
-    border-radius: 0 0 14px 14px;
+    background: rgba(28, 30, 38, 0.02);
+    margin: 6px -8px -2px;
+    padding: 8px;
+    border-radius: 8px;
     border-bottom: none;
   }
   .wrow-total .wc { background: transparent; border-top: none; padding: 0; }
-  .wrow-total .wc-day { flex: 1 1 0; min-width: 0; text-align: center; font-weight: 700; }
+  .wrow-total .wc-day {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: right;
+    padding-right: 2px;
+    font-weight: 700;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
   .wrow-total .wc-score::before, .wrow-total .wc-days::before { content: none; }
   .wrow-total .wc-name { flex: 1 1 auto; }
 
@@ -688,6 +722,47 @@ code {
   .form-row { flex-direction: column; align-items: stretch; }
   .form-row label { width: 100%; }
   .form-row input { width: 100%; }
+
+  /* passbook: stacked entries, month-view style */
+  .pb-table thead { display: none; }
+  .pb-table.data-table td {
+    display: block;
+    padding: 0;
+    border-bottom: none;
+    position: static;
+    box-shadow: none;
+    min-width: 0;
+  }
+  .pb-table tbody, .pb-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .pb-table tbody { width: 100%; }
+  .pb-table tbody tr {
+    gap: 2px 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grid);
+  }
+  .pb-table tbody tr:last-child { border-bottom: none; }
+  .pb-date {
+    order: 1;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .pb-source { order: 2; margin-left: auto; }
+  .pb-reason { order: 3; flex: 1 1 100%; font-weight: 600; }
+  .pb-income { order: 4; }
+  .pb-expense { order: 5; }
+  .pb-balance { order: 6; margin-left: auto; }
+  .pb-note { order: 7; flex: 1 1 100%; font-size: 12px; }
+  .pb-action { order: 8; margin-left: auto; }
+  .pb-table tfoot, .pb-table tfoot tr { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+  .pb-table tfoot tr { width: 100%; padding: 8px 0 0; border-top: 2px solid var(--grid); }
+  .pb-table tfoot td { display: block; padding: 0; border-top: none; }
+  .pb-table tfoot td[colspan] { flex: 1 1 auto; font-weight: 700; }
 
   .admin-table, .admin-table tbody { display: block; width: 100%; }
   .admin-table thead { display: none; }

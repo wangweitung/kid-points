@@ -19,7 +19,7 @@
 </div>
 
 <div class="table-wrap card">
-  <table class="data-table">
+  <table class="data-table pb-table">
     <thead>
       <tr>
         <th>日期</th><th>事由（得分 / 兑换了什么）</th>
@@ -30,15 +30,15 @@
     <tbody>
       {% for e in entries %}
       <tr>
-        <td>{{ e['date'] }}</td>
-        <td>{{ e['reason'] }}</td>
-        <td class="num income">{{ e['income']|fmt if e['income'] else '' }}</td>
-        <td class="num expense">{{ e['expense']|fmt if e['expense'] else '' }}</td>
-        <td class="num">{{ e['balance']|fmt }}</td>
-        <td class="muted">{{ e['note'] }}</td>
-        <td><span class="tag tag-{{ e['source'] }}">{{ source_labels.get(e['source'], e['source']) }}</span></td>
+        <td class="pb-date">{{ e['date'] }}</td>
+        <td class="pb-reason">{{ e['reason'] }}</td>
+        <td class="num income pb-income">{{ e['income']|fmt if e['income'] else '' }}</td>
+        <td class="num expense pb-expense">{{ e['expense']|fmt if e['expense'] else '' }}</td>
+        <td class="num pb-balance">{{ e['balance']|fmt }}</td>
+        <td class="muted pb-note">{{ e['note'] }}</td>
+        <td class="pb-source"><span class="tag tag-{{ e['source'] }}">{{ source_labels.get(e['source'], e['source']) }}</span></td>
         {% if session.get('role') == 'admin' %}
-        <td>
+        <td class="pb-action">
           {% if e['source'] != 'daily' %}
           <form method="post" action="{{ url_for('views.passbook_delete') }}" class="inline"
                 onsubmit="return confirm('确定删除这条记录吗？')">

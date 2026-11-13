@@ -94,18 +94,6 @@ function switchChild(sel) {
   window.location.href = url.toString();
 }
 
-function navPanel() {
-  return document.querySelector('.topbar');
-}
-
-function setNavOpen(open) {
-  const topbar = navPanel();
-  const toggle = document.querySelector('[data-nav-toggle]');
-  if (!topbar || !toggle) return;
-  topbar.classList.toggle('open', open);
-  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
-
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('[data-tick]').forEach(function (el) {
     el.addEventListener('click', function () { doTick(el); });
@@ -114,25 +102,13 @@ document.addEventListener('DOMContentLoaded', function () {
     sel.addEventListener('change', function () { switchChild(sel); });
   });
 
-  const toggle = document.querySelector('[data-nav-toggle]');
-  if (toggle) {
-    toggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const topbar = navPanel();
-      setNavOpen(!(topbar && topbar.classList.contains('open')));
-    });
-    document.addEventListener('click', function (e) {
-      const topbar = navPanel();
-      if (topbar && topbar.classList.contains('open') && !topbar.contains(e.target)) {
-        setNavOpen(false);
-      }
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setNavOpen(false);
-    });
-    document.querySelectorAll('.nav a').forEach(function (link) {
-      link.addEventListener('click', function () { setNavOpen(false); });
-    });
+  // 手机端横向标签条：把当前页的标签滚到可视范围内
+  const activeTab = document.querySelector('.nav a.active');
+  if (activeTab) {
+    const nav = activeTab.parentElement;
+    if (nav && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = activeTab.offsetLeft - (nav.clientWidth - activeTab.offsetWidth) / 2;
+    }
   }
 
   setTimeout(function () {

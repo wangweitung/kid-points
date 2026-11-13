@@ -11,10 +11,6 @@
 <body>
 <header class="topbar">
   <a class="brand" href="{{ url_for('views.today') }}">⭐ 小星星积分计划</a>
-  <button class="nav-toggle" type="button" data-nav-toggle
-          aria-label="菜单" aria-expanded="false" aria-controls="site-nav">
-    <span></span><span></span><span></span>
-  </button>
   <nav class="nav" id="site-nav">
     <a href="{{ url_for('views.today') }}"{% if request.endpoint == 'views.today' %} class="active"{% endif %}>今日</a>
     <a href="{{ url_for('views.week') }}"{% if request.endpoint == 'views.week' %} class="active"{% endif %}>周视图</a>
@@ -27,18 +23,18 @@
     {% if session.get('role') == 'admin' %}
       <a class="nav-admin{% if request.endpoint == 'admin.panel' %} active{% endif %}" href="{{ url_for('admin.panel') }}">管理</a>
     {% endif %}
-    <div class="userbox">
-      {% if children is defined and children %}
-        <select class="child-switch" data-switch-child title="切换小朋友">
-          {% for c in children %}
-            <option value="{{ c['id'] }}" {% if child is defined and child and child['id'] == c['id'] %}selected{% endif %}>{{ c['name'] }}</option>
-          {% endfor %}
-        </select>
-      {% endif %}
-      <span class="who">{{ session.get('username', '') }}</span>
-      <a class="logout" href="{{ url_for('auth.logout') }}">退出</a>
-    </div>
   </nav>
+  <div class="userbox">
+    {% if children is defined and children %}
+      <select class="child-switch" data-switch-child title="切换小朋友">
+        {% for c in children %}
+          <option value="{{ c['id'] }}" {% if child is defined and child and child['id'] == c['id'] %}selected{% endif %}>{{ c['name'] }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+    <span class="who">{{ session.get('username', '') }}</span>
+    <a class="logout" href="{{ url_for('auth.logout') }}">退出</a>
+  </div>
 </header>
 
 {% with messages = get_flashed_messages(with_categories=true) %}

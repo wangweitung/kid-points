@@ -85,24 +85,24 @@
 <script>
 (function () {
   const DATA = {{ chart_data|tojson }};
-  const BLUE = '#2a78d6';
-  const ORANGE = '#eb6834';
-  const GRID = '#e1e0d9';
-  const AXIS = '#c3c2b7';
-  const MUTED = '#898781';
-  const INK = '#0b0b0b';
+  const BLUE = '#007aff';
+  const ORANGE = '#ff9500';
+  const GRID = '#e5e5ea';
+  const AXIS = '#c7c7cc';
+  const MUTED = '#8e8e93';
+  const INK = '#1c1c1e';
 
-  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+  Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
   Chart.defaults.color = MUTED;
   Chart.register(ChartDataLabels);
   Chart.defaults.plugins.datalabels.display = false;
 
   const tooltipStyle = {
-    backgroundColor: '#0b0b0b',
-    titleColor: '#f0efec',
-    bodyColor: '#f0efec',
+    backgroundColor: 'rgba(28, 28, 30, 0.92)',
+    titleColor: '#f2f2f7',
+    bodyColor: '#f2f2f7',
     padding: 10,
-    cornerRadius: 6
+    cornerRadius: 10
   };
 
   function axisX() {

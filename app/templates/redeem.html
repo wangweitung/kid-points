@@ -63,11 +63,11 @@
     <button type="submit" class="btn btn-primary">添加</button>
   </form>
   <table class="data-table">
-    <thead><tr><th>分值</th><th>名称</th><th>操作</th></tr></thead>
+    <thead><tr><th>分值</th><th>名称</th><th>状态</th><th>操作</th></tr></thead>
     <tbody>
-      {% for item in items %}
-      <tr>
-        <td colspan="3">
+      {% for item in all_items %}
+      <tr class="{% if not item['active'] %}row-inactive{% endif %}">
+        <td colspan="4">
           <form method="post" action="{{ url_for('views.catalog_update') }}" class="inline-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ item['id'] }}">
@@ -75,12 +75,14 @@
             <input type="text" name="name" value="{{ item['name'] }}" class="w-240" title="名称">
             <button type="submit" class="btn btn-small">保存</button>
           </form>
-          <form method="post" action="{{ url_for('views.catalog_delete') }}" class="inline"
-                onsubmit="return confirm('确定删除「{{ item['name'] }}」吗？')">
+          <form method="post" action="{{ url_for('views.catalog_toggle') }}" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ item['id'] }}">
-            <button type="submit" class="btn-link danger">删除</button>
+            <button type="submit" class="btn btn-small {% if item['active'] %}btn-ghost{% else %}btn-primary{% endif %}">
+              {% if item['active'] %}停用{% else %}启用{% endif %}
+            </button>
           </form>
+          {% if not item['active'] %}<span class="tag tag-off">已停用</span>{% endif %}
         </td>
       </tr>
       {% endfor %}

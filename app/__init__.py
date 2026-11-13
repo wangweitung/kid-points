@@ -18,11 +18,13 @@ def _secret_key(data_dir: Path) -> str:
     if env:
         return env
     path = data_dir / "secret_key"
-    if path.exists():
-        return path.read_text(encoding="utf-8")
-    key = secrets.token_hex(32)
-    path.write_text(key, encoding="utf-8")
-    return key
+    if not path.exists():
+        path.write_text(secrets.token_hex(32), encoding="utf-8")
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
+    return path.read_text(encoding="utf-8")
 
 
 def _fmt_filter(value):

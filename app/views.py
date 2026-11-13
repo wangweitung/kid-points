@@ -478,6 +478,9 @@ def redeem():
     items = db.execute(
         "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
     ).fetchall()
+    all_items = db.execute(
+        "SELECT * FROM catalog ORDER BY active DESC, sort_order, id"
+    ).fetchall()
     now = local_today()
     first = date(now.year, now.month, 1)
     history = db.execute(
@@ -497,6 +500,7 @@ def redeem():
         child=child,
         children=children,
         items=items,
+        all_items=all_items,
         history=history,
         balance=balance,
         month_redemptions=round(month_spent, 2),
@@ -580,12 +584,28 @@ def catalog_update():
 @bp.post("/catalog/delete")
 @admin_required
 def catalog_delete():
+    # Soft delete: keep the row so historical redemptions (matched by reason
+    # text) and sort order stay intact; the item just leaves the shop list.
     db = get_db()
     cur = db.execute(
-        "DELETE FROM catalog WHERE id = ?", (request.form.get("id", type=int) or -1,)
+        "UPDATE catalog SET active = 0 WHERE id = ?",
+        (request.form.get("id", type=int) or -1,),
     )
     db.commit()
-    flash("已删除" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
+    flash("已下架" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
+    return redirect(url_for("views.redeem"))
+
+
+@bp.post("/catalog/toggle")
+@admin_required
+def catalog_toggle():
+    db = get_db()
+    cur = db.execute(
+        "UPDATE catalog SET active = 1 - active WHERE id = ?",
+        (request.form.get("id", type=int) or -1,),
+    )
+    db.commit()
+    flash("已更新商品状态" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
     return redirect(url_for("views.redeem"))
 
 

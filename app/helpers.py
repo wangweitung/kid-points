@@ -42,7 +42,8 @@ def session_user():
             session.clear()
             flash("登录已失效，请重新登录", "error")
         else:
-            session["role"] = row["role"]
+            if session.get("role") != row["role"]:
+                session["role"] = row["role"]
             user = row
     g._session_user = user
     return user
@@ -93,7 +94,10 @@ def current_child():
         return None, children
     cid = request.args.get("child", type=int) or session.get("child_id")
     child = next((c for c in children if c["id"] == cid), None) or children[0]
-    session["child_id"] = child["id"]
+    # Only touch the session when the selection actually changes, so plain
+    # page views do not force a Set-Cookie on every response.
+    if session.get("child_id") != child["id"]:
+        session["child_id"] = child["id"]
     return child, children
 
 
@@ -122,25 +126,22 @@ def day_score(db, child_id, d: date):
 def sync_daily(db, child_id, d: date):
     cnt, total = day_score(db, child_id, d)
     ds = d.isoformat()
-    row = db.execute(
-        "SELECT id FROM ledger WHERE child_id = ? AND date = ? AND source = 'daily'",
-        (child_id, ds),
-    ).fetchone()
     if cnt:
         reason = f"每日得分（完成 {cnt} 项）"
-        if row:
-            db.execute(
-                "UPDATE ledger SET income = ?, reason = ? WHERE id = ?",
-                (total, reason, row["id"]),
-            )
-        else:
-            db.execute(
-                "INSERT INTO ledger(child_id, date, reason, income, source) "
-                "VALUES(?, ?, ?, ?, 'daily')",
-                (child_id, ds, reason, total),
-            )
-    elif row:
-        db.execute("DELETE FROM ledger WHERE id = ?", (row["id"],))
+        # Upsert against the partial unique index so concurrent ticks
+        # cannot race a SELECT-then-INSERT into IntegrityError.
+        db.execute(
+            """INSERT INTO ledger(child_id, date, reason, income, source)
+               VALUES(?, ?, ?, ?, 'daily')
+               ON CONFLICT(child_id, date) WHERE source = 'daily'
+               DO UPDATE SET income = excluded.income, reason = excluded.reason""",
+            (child_id, ds, reason, total),
+        )
+    else:
+        db.execute(
+            "DELETE FROM ledger WHERE child_id = ? AND date = ? AND source = 'daily'",
+            (child_id, ds),
+        )
 
 
 def resync_all_daily(db):

@@ -1,3 +1,5 @@
+import sqlite3
+
 from flask import (
     Blueprint,
     flash,
@@ -39,6 +41,14 @@ def setup():
         if password != confirm:
             errors.append("两次输入的密码不一致")
         if not errors:
+            db = get_db()
+            # Serialize the final has-users check with creation so two
+            # concurrent setups cannot both create an admin.
+            if not db.in_transaction:
+                db.execute("BEGIN IMMEDIATE")
+            if db.execute("SELECT 1 FROM users LIMIT 1").fetchone():
+                db.rollback()
+                return redirect(url_for("auth.login"))
             _create_user(username, password, "admin")
             flash("管理员创建成功，请登录", "ok")
             return redirect(url_for("auth.login"))
@@ -91,9 +101,14 @@ def register():
         ).fetchone():
             errors.append("用户名已存在")
         if not errors:
-            _create_user(username, password, "user")
-            flash("注册成功，请登录", "ok")
-            return redirect(url_for("auth.login"))
+            try:
+                _create_user(username, password, "user")
+            except sqlite3.IntegrityError:
+                get_db().rollback()
+                errors.append("用户名已存在")
+            else:
+                flash("注册成功，请登录", "ok")
+                return redirect(url_for("auth.login"))
         for e in errors:
             flash(e, "error")
         return render_template("register.html", username=username)

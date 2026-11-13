@@ -53,6 +53,7 @@ function applyTick(el, data) {
 
   document.querySelectorAll('[data-day-total]').forEach(function (node) {
     const v = data.day_totals[node.dataset.dayTotal];
+    if (v === undefined) return; // 打卡日期不在当前视图周时保持原样
     node.textContent = v ? fmtNum(v) : '';
   });
   document.querySelectorAll('[data-strip-total]').forEach(function (node) {

@@ -22,4 +22,130 @@
     </tbody>
   </table>
 </div>
+
+<details class="card table-view">
+  <summary>页面与样式速查（改界面时告诉我区域名即可）</summary>
+
+  <nav class="guide-toc">
+    <a href="#common">共用部分</a>
+    <a href="#page-today">今日打卡</a>
+    <a href="#page-week">周视图</a>
+    <a href="#page-month">月视图</a>
+    <a href="#page-passbook">存折</a>
+    <a href="#page-redeem">兑换</a>
+    <a href="#page-charts">图表</a>
+    <a href="#page-admin">管理</a>
+    <a href="#page-auth">登录 / 注册</a>
+    <a href="#files">相关文件</a>
+  </nav>
+
+  <div class="guide-page">
+    <h2 id="common">共用部分（每个页面都有）</h2>
+    <table class="data-table">
+      <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>顶栏</td><td><code>.topbar</code></td><td>页面顶部固定栏，含品牌、导航、用户区</td></tr>
+        <tr><td>导航菜单</td><td><code>.nav</code> / 当前页 <code>a.active</code></td><td>桌面平铺；手机端为横向滑动标签条，当前页高亮并自动滚到可视位置</td></tr>
+        <tr><td>用户区</td><td><code>.userbox</code></td><td>小朋友切换 <code>.child-switch</code>、用户名 <code>.who</code>、退出 <code>.logout</code></td></tr>
+        <tr><td>提示条</td><td><code>.flash</code>（<code>.flash-ok</code> / <code>.flash-error</code>）</td><td>操作结果提示，4 秒后自动淡出</td></tr>
+        <tr><td>页面标题区</td><td><code>.page-head</code></td><td>左侧标题 + 说明，右侧统计标签 <code>.chip</code></td></tr>
+        <tr><td>卡片 / 按钮</td><td><code>.card</code> / <code>.btn</code></td><td>白色圆角卡片；按钮有 <code>.btn-primary</code> <code>.btn-ghost</code> <code>.btn-danger</code> <code>.btn-small</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-today">今日打卡（<code>/</code>，<code>today.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>今日统计</td><td><code>#today-total</code> <code>#today-count</code>（打卡后自动更新）</td></tr>
+        <tr><td>任务卡片</td><td><code>.task-grid</code> 里的 <code>.task-card</code>；完成态 <code>.done</code>，勾选圈 <code>.task-check</code></td></tr>
+        <tr><td>近 7 天条</td><td><code>.strip</code> 里的 <code>.strip-day</code>；得分挂 <code>data-strip-total</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-week">周视图（<code>/week</code>，<code>week.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>周积分卡</td><td><code>.week-board</code>（行 <code>.wrow</code>，格 <code>.wc</code>）；打卡格 <code>.cell</code>（<code>.done</code> / <code>.future</code> / <code>.locked</code>，标记 <code>.cell-mark</code>）</td></tr>
+        <tr><td>合计挂点</td><td><code>#week-total</code> <code>#week-days</code> <code>data-day-total</code> <code>data-task-score</code> <code>data-task-days</code></td></tr>
+        <tr><td>本周结算</td><td><code>.settle</code>，条目以 <code>set-</code> 开头；旁边是兑换价目卡</td></tr>
+        <tr><td>周记</td><td><code>.note-card</code>（本周最棒的一件事）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-month">月视图（<code>/month</code>，<code>month.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>月历</td><td><code>.cal-grid</code> 里的 <code>.cal-cell</code>；得分 <code>.cal-score</code>，今天 <code>.today</code>，未来 <code>.future</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-passbook">存折（<code>/passbook</code>，<code>passbook.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>流水表</td><td><code>.pb-table</code>；收入 <code>.income</code>、支出 <code>.expense</code>、来源 <code>.tag</code></td></tr>
+        <tr><td>手动记一笔</td><td>管理员可见，<code>.form-row</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-redeem">兑换（<code>/redeem</code>，<code>redeem.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>商品卡片</td><td><code>.redeem-card</code>；价格 <code>.redeem-price</code>，积分不足 <code>.poor</code></td></tr>
+        <tr><td>兑换记录 / 价目管理</td><td>记录表 <code>.data-table</code>；价目管理管理员可见</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-charts">图表（<code>/charts</code>，<code>charts.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>统计块</td><td><code>.stat-row</code> 里的 <code>.stat-tile</code></td></tr>
+        <tr><td>图表区</td><td><code>.chart-grid</code> 里的 <code>.chart-box</code>：每日得分与余额（组合图）、支出构成、任务完成次数</td></tr>
+        <tr><td>数据表</td><td><code>.table-view</code> 折叠</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-admin">管理（<code>/admin</code>，<code>admin.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>开关与添加</td><td><code>.admin-grid</code> 里的 <code>.card</code>；表单行 <code>.form-row</code></td></tr>
+        <tr><td>管理表格</td><td><code>.admin-table</code>（手机端堆叠为卡片式行）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="page-auth">登录 / 注册（<code>login.html</code> <code>register.html</code> <code>setup.html</code>）</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td>居中卡片</td><td><code>.auth-card</code>；品牌行 <code>.auth-brand</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="guide-page">
+    <h2 id="files">相关文件</h2>
+    <table class="data-table">
+      <tbody>
+        <tr><td><code>app/templates/*.html</code></td><td>页面结构；<code>base.html</code> 是共用骨架</td></tr>
+        <tr><td><code>app/static/style.css</code></td><td>全部外观：<code>:root</code> 色板与间距变量 <code>--gap</code>，字号图表高度用 <code>clamp()</code> 缩放，手机端在底部 <code>@media</code> 块</td></tr>
+        <tr><td><code>app/static/app.js</code></td><td>打卡 <code>doTick/applyTick</code>、切小朋友、导航标签居中</td></tr>
+        <tr><td><code>app/views.py</code></td><td>路由与数据</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
 {% endblock %}

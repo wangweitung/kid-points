@@ -734,9 +734,3 @@ def charts():
 def help():
     child, children = current_child()
     return render_template("help.html", child=child, children=children)
-
-
-@bp.get("/ui-guide")
-def ui_guide():
-    child, children = current_child()
-    return render_template("ui-guide.html", child=child, children=children)

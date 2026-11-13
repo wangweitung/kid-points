@@ -42,13 +42,8 @@
 
 <div class="chart-grid">
   <div class="card chart-card">
-    <h2>每日得分</h2>
-    <div class="chart-box"><canvas id="chart-daily"></canvas></div>
-  </div>
-
-  <div class="card chart-card">
-    <h2>余额走势</h2>
-    <div class="chart-box"><canvas id="chart-balance"></canvas></div>
+    <h2>每日得分与余额</h2>
+    <div class="chart-box chart-box-tall"><canvas id="chart-daily"></canvas></div>
   </div>
 
   <div class="card chart-card">
@@ -128,22 +123,51 @@
       type: 'bar',
       data: {
         labels: DATA.labels,
-        datasets: [{
-          data: DATA.daily_scores,
-          backgroundColor: BLUE,
-          borderRadius: 4,
-          borderSkipped: 'start',
-          barPercentage: 0.75,
-          categoryPercentage: 0.85
-        }]
+        datasets: [
+          {
+            label: '得分',
+            data: DATA.daily_scores,
+            backgroundColor: BLUE,
+            borderRadius: 4,
+            borderSkipped: 'start',
+            barPercentage: 0.75,
+            categoryPercentage: 0.85,
+            yAxisID: 'y'
+          },
+          {
+            label: '余额',
+            data: DATA.balances,
+            type: 'line',
+            borderColor: ORANGE,
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: ORANGE,
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
+            tension: 0.25,
+            fill: false,
+            yAxisID: 'y1'
+          }
+        ]
       },
       options: {
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: false },
-          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 得分 ' + c.parsed.y + ' 分' } },
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 11 } }
+          },
+          tooltip: {
+            ...tooltipStyle,
+            callbacks: {
+              label: c => ' ' + c.dataset.label + ' ' + (c.parsed.y === null ? '—' : c.parsed.y) + ' 分'
+            }
+          },
           datalabels: {
-            display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+            display: ctx => ctx.dataset.type !== 'line' && ctx.dataset.data[ctx.dataIndex] > 0,
             anchor: 'end',
             align: 'top',
             color: INK,
@@ -151,45 +175,15 @@
             formatter: v => v
           }
         },
-        scales: { x: axisX(), y: axisY(true) }
-      }
-    });
-  }
-
-  const balanceCanvas = document.getElementById('chart-balance');
-  if (balanceCanvas) {
-    new Chart(balanceCanvas, {
-      type: 'line',
-      data: {
-        labels: DATA.labels,
-        datasets: [{
-          data: DATA.balances,
-          borderColor: ORANGE,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: ORANGE,
-          pointHoverBorderColor: '#ffffff',
-          pointHoverBorderWidth: 2,
-          tension: 0.25,
-          fill: false
-        }]
-      },
-      options: {
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 余额 ' + c.parsed.y + ' 分' } },
-          datalabels: {
-            display: 'auto',
-            anchor: 'end',
-            align: 'top',
-            color: ORANGE,
-            font: { size: 10, weight: 600 },
-            formatter: v => (v === null ? null : v)
-          }
-        },
-        scales: { x: axisX(), y: axisY(false) }
+        scales: {
+          x: axisX(),
+          y: Object.assign(axisY(true), { position: 'left' }),
+          y1: Object.assign(axisY(false), {
+            position: 'right',
+            grid: { display: false },
+            ticks: { color: MUTED, precision: 0 }
+          })
+        }
       }
     });
   }

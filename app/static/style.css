@@ -487,6 +487,7 @@ table { border-collapse: collapse; width: 100%; }
   margin-bottom: var(--gap);
 }
 .admin-grid .card { margin-bottom: 0; }
+.admin-grid .inline-form { margin: 6px 8px 0 0; }
 .inline { display: inline; }
 .inline-form { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-right: 8px; }
 .form-row {
@@ -648,11 +649,15 @@ code {
 
   /* page head: stack title above chips */
   .page-head { align-items: stretch; }
+  .page-head .muted { margin-top: 2px; font-size: 13px; line-height: 1.4; }
   .page-head .chips { margin-top: 4px; }
 
   /* larger touch targets */
   .btn { padding: 11px 18px; font-size: 15px; }
+  .week-nav .btn, .month-nav .btn { white-space: nowrap; }
   .task-card { padding: 15px 14px; }
+  /* 周卡手机端隐藏「天数」列，行更紧凑 */
+  .wc-days, .wrow-total .wc-days { display: none; }
 
   /* week board: 紧凑月历风格, no horizontal scrolling */
   .week-board { display: block; padding: 10px 8px; }

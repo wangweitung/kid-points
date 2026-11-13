@@ -81,6 +81,7 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='chartjs-plugin-datalabels.min.js') }}"></script>
 <script>
 (function () {
   const DATA = {{ chart_data|tojson }};
@@ -89,9 +90,12 @@
   const GRID = '#e1e0d9';
   const AXIS = '#c3c2b7';
   const MUTED = '#898781';
+  const INK = '#0b0b0b';
 
   Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
   Chart.defaults.color = MUTED;
+  Chart.register(ChartDataLabels);
+  Chart.defaults.plugins.datalabels.display = false;
 
   const tooltipStyle = {
     backgroundColor: '#0b0b0b',
@@ -137,7 +141,15 @@
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
-          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 得分 ' + c.parsed.y + ' 分' } }
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 得分 ' + c.parsed.y + ' 分' } },
+          datalabels: {
+            display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+            anchor: 'end',
+            align: 'top',
+            color: INK,
+            font: { size: 10, weight: 600 },
+            formatter: v => v
+          }
         },
         scales: { x: axisX(), y: axisY(true) }
       }
@@ -167,7 +179,15 @@
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
-          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 余额 ' + c.parsed.y + ' 分' } }
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' 余额 ' + c.parsed.y + ' 分' } },
+          datalabels: {
+            display: 'auto',
+            anchor: 'end',
+            align: 'top',
+            color: ORANGE,
+            font: { size: 10, weight: 600 },
+            formatter: v => (v === null ? null : v)
+          }
         },
         scales: { x: axisX(), y: axisY(false) }
       }
@@ -193,7 +213,15 @@
       options: {
         plugins: {
           legend: { display: false },
-          tooltip: { ...tooltipStyle, callbacks: { label: c => ' ' + labelFormatter(c.parsed.x) } }
+          tooltip: { ...tooltipStyle, callbacks: { label: c => ' ' + labelFormatter(c.parsed.x) } },
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            clamp: true,
+            color: INK,
+            font: { size: 11, weight: 600 },
+            formatter: v => labelFormatter(v)
+          }
         },
         scales: {
           x: {

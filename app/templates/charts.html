@@ -193,7 +193,6 @@
     if (!el) return;
     new Chart(el, {
       type: 'bar',
-      indexAxis: 'y',
       data: {
         labels: items.map(i => i.label),
         datasets: [{
@@ -205,6 +204,7 @@
         }]
       },
       options: {
+        indexAxis: 'y',
         plugins: {
           legend: { display: false },
           tooltip: { ...tooltipStyle, callbacks: { label: c => ' ' + labelFormatter(c.parsed.x) } },

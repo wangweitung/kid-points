@@ -8,7 +8,7 @@
 <div class="admin-grid">
   <div class="card">
     <h2>开关</h2>
-    <p class="muted">注册：关闭后登录页不再显示注册入口。补记：开启后可修改过去日期的打卡，关闭后只能改今天。</p>
+    <p class="muted">注册：关闭后登录页不显示注册入口。补记：关闭后只能修改今天的打卡。</p>
     <div class="switch-row">
       <form method="post" action="{{ url_for('admin.registration') }}" class="inline-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -53,7 +53,7 @@
 <div class="card">
   <h2>任务管理</h2>
   <div class="table-wrap">
-  <table class="data-table admin-table">
+  <table class="data-table admin-table form-table">
     <thead><tr><th>任务</th><th>分值</th><th>状态</th><th>操作</th></tr></thead>
     <tbody>
       {% for t in tasks %}
@@ -85,7 +85,7 @@
 <div class="card">
   <h2>小朋友管理</h2>
   <div class="table-wrap">
-  <table class="data-table admin-table">
+  <table class="data-table admin-table form-table">
     <thead><tr><th>姓名</th><th>期初余额</th><th>状态</th><th>操作</th></tr></thead>
     <tbody>
       {% for c in children %}

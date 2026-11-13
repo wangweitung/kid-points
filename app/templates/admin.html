@@ -59,7 +59,8 @@
 
 <div class="card">
   <h2>任务管理</h2>
-  <table class="data-table">
+  <div class="table-wrap">
+  <table class="data-table admin-table">
     <thead><tr><th>任务</th><th>分值</th><th>状态</th><th>操作</th></tr></thead>
     <tbody>
       {% for t in tasks %}
@@ -85,11 +86,13 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 
 <div class="card">
   <h2>小朋友管理</h2>
-  <table class="data-table">
+  <div class="table-wrap">
+  <table class="data-table admin-table">
     <thead><tr><th>姓名</th><th>期初余额</th><th>状态</th><th>操作</th></tr></thead>
     <tbody>
       {% for c in children %}
@@ -118,11 +121,13 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 
 <div class="card">
   <h2>用户管理</h2>
-  <table class="data-table">
+  <div class="table-wrap">
+  <table class="data-table admin-table">
     <thead><tr><th>用户名</th><th>角色</th><th>创建时间</th><th>操作</th></tr></thead>
     <tbody>
       {% for u in users %}
@@ -161,5 +166,6 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% endblock %}

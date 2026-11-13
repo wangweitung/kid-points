@@ -185,7 +185,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 .task-card {
   display: flex;
@@ -231,6 +231,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
+  margin-bottom: 18px;
 }
 .strip-day {
   background: var(--surface);
@@ -253,7 +254,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 .month-label { font-weight: 600; min-width: 90px; text-align: center; }
 
@@ -391,6 +392,7 @@ table { border-collapse: collapse; width: 100%; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+  margin-bottom: 18px;
 }
 .week-cols .card { margin-bottom: 0; }
 .settle dl { margin: 0; }
@@ -462,6 +464,7 @@ table { border-collapse: collapse; width: 100%; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+  margin-bottom: 18px;
 }
 .chart-card { margin-bottom: 0; }
 .chart-box { position: relative; height: 260px; }
@@ -473,6 +476,7 @@ table { border-collapse: collapse; width: 100%; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 18px;
+  margin-bottom: 18px;
 }
 .admin-grid .card { margin-bottom: 0; }
 .inline { display: inline; }
@@ -677,6 +681,60 @@ code {
   .table-wrap.card { margin-left: 0; margin-right: 0; }
 }
 
+/* 手机/小平板：管理类表格改为纵向堆叠的卡片式行 */
+@media (max-width: 640px) {
+  .card { padding: 14px 16px; }
+
+  .form-row { flex-direction: column; align-items: stretch; }
+  .form-row label { width: 100%; }
+  .form-row input { width: 100%; }
+
+  .admin-table, .admin-table tbody { display: block; width: 100%; }
+  .admin-table thead { display: none; }
+  .admin-table tr {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grid);
+  }
+  .admin-table tr:last-child { border-bottom: none; }
+  .admin-table.data-table td {
+    display: block;
+    width: 100%;
+    padding: 4px 0;
+    border-bottom: none;
+    position: static;
+    box-shadow: none;
+  }
+  .admin-table .inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin: 0 0 8px;
+    gap: 6px;
+    align-items: center;
+  }
+  .admin-table .inline-form input {
+    flex: 1 1 130px;
+    width: auto;
+    min-width: 0;
+  }
+  .admin-table .inline-form select { flex: 1 1 130px; min-width: 0; }
+  .admin-table .inline {
+    display: flex;
+    width: 100%;
+    margin: 0 0 8px;
+  }
+  .admin-table .inline form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .admin-table .btn-link { margin-left: 0; }
+}
+
 @media (max-width: 480px) {
   body { font-size: 14px; }
   h1 { font-size: 20px; }
@@ -694,7 +752,4 @@ code {
   .flashes { padding: 0 12px; }
   .week-nav, .month-nav { flex-wrap: wrap; }
   .week-nav .btn, .month-nav .btn { padding: 8px 12px; font-size: 13px; }
-  .form-row { flex-direction: column; align-items: stretch; }
-  .form-row label { width: 100%; }
-  .form-row input { width: 100%; }
 }

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}页面说明 · 小星星积分计划{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>页面说明</h1>
+    <p class="muted">每个页面有哪些区域、对应的样式类和元素 ID。改界面时可以直接说「改 XX 页的 XX 区」。</p>
+  </div>
+</div>
+
+<nav class="card guide-toc">
+  <a href="#common">共用部分</a>
+  <a href="#page-today">今日打卡</a>
+  <a href="#page-week">周视图</a>
+  <a href="#page-month">月视图</a>
+  <a href="#page-passbook">存折</a>
+  <a href="#page-redeem">兑换</a>
+  <a href="#page-charts">图表</a>
+  <a href="#page-help">说明</a>
+  <a href="#page-admin">管理</a>
+  <a href="#page-auth">登录 / 注册</a>
+  <a href="#files">相关文件</a>
+</nav>
+
+<div class="card guide-page">
+  <h2 id="common">共用部分（每个页面都有）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>顶栏</td><td><code>.topbar</code></td><td>页面顶部固定栏，含品牌、导航、用户区</td></tr>
+      <tr><td>品牌标题</td><td><code>.brand</code></td><td>左上角「⭐ 小星星积分计划」，点击回今日打卡</td></tr>
+      <tr><td>导航菜单</td><td><code>.nav</code> / 当前页 <code>a.active</code></td><td>今日 / 周视图 / 月视图 / 存折 / 兑换 / 图表 / 说明 / 管理</td></tr>
+      <tr><td>汉堡按钮</td><td><code>.nav-toggle</code></td><td>手机端菜单开关，展开时顶栏加 <code>.open</code></td></tr>
+      <tr><td>用户区</td><td><code>.userbox</code></td><td>小朋友切换下拉 <code>.child-switch</code>、用户名 <code>.who</code>、退出 <code>.logout</code></td></tr>
+      <tr><td>提示条</td><td><code>.flash</code>（<code>.flash-ok</code> / <code>.flash-error</code>）</td><td>操作结果提示，4 秒后自动淡出</td></tr>
+      <tr><td>页面标题区</td><td><code>.page-head</code></td><td>左侧 h1 标题 + 灰色说明，右侧统计标签</td></tr>
+      <tr><td>统计标签</td><td><code>.chip</code>（余额 <code>.chip-balance</code>、得分 <code>.chip-score</code>）</td><td>余额的 &lt;b&gt; 有 <code>id="balance"</code>，打卡后自动更新</td></tr>
+      <tr><td>卡片容器</td><td><code>.card</code></td><td>白色圆角卡片，页面上大多数内容块都用它</td></tr>
+      <tr><td>按钮</td><td><code>.btn</code>（主要 <code>.btn-primary</code>、描边 <code>.btn-ghost</code>、危险 <code>.btn-danger</code>、小号 <code>.btn-small</code>）</td><td>全站按钮样式</td></tr>
+      <tr><td>内容区</td><td><code>.container</code></td><td>主体内容，桌面最大 1120px 居中</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-today">今日打卡（<code>/</code>，模板 <code>today.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>日期与星期</td><td><code>.page-head</code> 左侧</td><td>当天日期 + 星期</td></tr>
+      <tr><td>今日统计</td><td><code>#today-total</code> <code>#today-count</code></td><td>今日得分 / 完成项数，打卡后自动更新</td></tr>
+      <tr><td>任务卡片</td><td><code>.task-grid</code> 里的 <code>.task-card</code></td><td>点击打卡；完成态 <code>.done</code>，勾选圈 <code>.task-check</code>，分值 <code>.task-value</code></td></tr>
+      <tr><td>近 7 天条</td><td><code>.strip</code> 里的 <code>.strip-day</code></td><td>每天得分 <code>.strip-score</code>，今天高亮 <code>.today</code>；得分格有 <code>data-strip-total</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-week">周视图（<code>/week</code>，模板 <code>week.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>翻周按钮</td><td><code>.week-nav</code></td><td>上周 / 本周 / 下周</td></tr>
+      <tr><td>周积分卡表格</td><td><code>.table-wrap</code> 里的 <code>.week-table</code></td><td>每天格子 <code>.cell</code>（完成 <code>.done</code>、未来 <code>.future</code>、锁定 <code>.locked</code>）</td></tr>
+      <tr><td>本周得分 / 完成天数</td><td><code>#week-total</code> <code>#week-days</code></td><td>合计行；每行小计挂 <code>data-task-score</code> / <code>data-task-days</code></td></tr>
+      <tr><td>每日合计</td><td><code>data-day-total</code></td><td>合计行每天的分数</td></tr>
+      <tr><td>本周结算</td><td><code>.settle</code>，条目 <code>#set-opening</code> 等以 <code>set-</code> 开头</td><td>期初 / 得分 / 可用 / 支出 / 转入下周</td></tr>
+      <tr><td>兑换价目</td><td>结算右边的 <code>.card</code></td><td>已兑换打勾 <code>.check.on</code></td></tr>
+      <tr><td>本周最棒的一件事</td><td><code>.note-card</code></td><td>保存周记文本</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-month">月视图（<code>/month</code>，模板 <code>month.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>翻月按钮</td><td><code>.month-nav</code></td><td>上月 / 本月 / 下月</td></tr>
+      <tr><td>月历</td><td><code>.cal-grid</code> 里的 <code>.cal-cell</code></td><td>每天显示得分 <code>.cal-score</code>，点击进该周积分卡；今天 <code>.today</code>、未来 <code>.future</code></td></tr>
+      <tr><td>底部说明</td><td><code>.muted</code> 段落</td><td>月历下方灰字说明</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-passbook">存折（<code>/passbook</code>，模板 <code>passbook.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>翻月按钮</td><td><code>.month-nav</code></td><td>上月 / 下月</td></tr>
+      <tr><td>流水的表</td><td><code>.table-wrap</code> 里的 <code>.data-table</code></td><td>收入 <code>.income</code> 绿、支出 <code>.expense</code> 红；来源标签 <code>.tag</code></td></tr>
+      <tr><td>手动记一笔</td><td>管理员可见，<code>.form-row</code></td><td>日期 / 事由 / 收入 / 支出 / 备注</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-redeem">兑换（<code>/redeem</code>，模板 <code>redeem.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>商品卡片</td><td><code>.redeem-grid</code> 里的 <code>.redeem-card</code></td><td>价格 <code>.redeem-price</code>、名称 <code>.redeem-name</code>；积分不足 <code>.poor</code></td></tr>
+      <tr><td>本月兑换记录</td><td><code>.data-table</code></td><td>商品卡下面的表</td></tr>
+      <tr><td>价目管理</td><td>管理员可见</td><td>添加 / 改价改名 / 停用启用</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-charts">图表（<code>/charts</code>，模板 <code>charts.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>统计块</td><td><code>.stat-row</code> 里的 <code>.stat-tile</code></td><td>本月得分 / 收入 / 支出 / 期末余额等</td></tr>
+      <tr><td>图表区</td><td><code>.chart-grid</code> 里的 <code>.chart-box</code></td><td>每日得分折线、余额走势、支出构成、任务完成次数</td></tr>
+      <tr><td>数据表折叠</td><td><code>.table-view</code></td><td>图表下方点开可看原始数据表</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-help">说明（<code>/help</code>，模板 <code>help.html</code>）</h2>
+  <table class="data-table">
+    <tbody>
+      <tr><td>使用规则表</td><td><code>.help-card</code> 里的 <code>.data-table</code>，两列「事项 / 说明」</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-admin">管理（<code>/admin</code>，模板 <code>admin.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>管理卡片栅格</td><td><code>.admin-grid</code> 里的 <code>.card</code></td><td>任务管理、小朋友管理、初始余额、补记开关等</td></tr>
+      <tr><td>表单行</td><td><code>.form-row</code></td><td>卡片内的横向表单</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="page-auth">登录 / 注册 / 首次设置（<code>login.html</code> <code>register.html</code> <code>setup.html</code>）</h2>
+  <table class="data-table">
+    <thead><tr><th>区域</th><th>类名 / ID</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>居中卡片</td><td><code>.auth-card</code></td><td>全页居中，深阴影卡片，无顶栏</td></tr>
+      <tr><td>品牌行</td><td><code>.auth-brand</code></td><td>卡片顶部的应用名</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card guide-page">
+  <h2 id="files">相关文件（要改哪类东西，看哪个文件）</h2>
+  <table class="data-table">
+    <thead><tr><th>文件</th><th>管什么</th></tr></thead>
+    <tbody>
+      <tr><td><code>app/templates/*.html</code></td><td>每个页面的结构和文案；<code>base.html</code> 是共用骨架</td></tr>
+      <tr><td><code>app/static/style.css</code></td><td>全部外观：颜色变量在最上面 <code>:root</code>，各区域按注释分节，手机端在底部两个 <code>@media</code> 块</td></tr>
+      <tr><td><code>app/static/app.js</code></td><td>打卡 <code>doTick/applyTick</code>、切小朋友、手机菜单开关</td></tr>
+      <tr><td><code>app/views.py</code></td><td>每个页面的路由和数据</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

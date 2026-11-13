@@ -23,6 +23,7 @@
     <a href="{{ url_for('views.redeem') }}"{% if request.endpoint == 'views.redeem' %} class="active"{% endif %}>兑换</a>
     <a href="{{ url_for('views.charts') }}"{% if request.endpoint == 'views.charts' %} class="active"{% endif %}>图表</a>
     <a href="{{ url_for('views.help') }}"{% if request.endpoint == 'views.help' %} class="active"{% endif %}>说明</a>
+    <a href="{{ url_for('views.ui_guide') }}"{% if request.endpoint == 'views.ui_guide' %} class="active"{% endif %}>页面说明</a>
     {% if session.get('role') == 'admin' %}
       <a class="nav-admin{% if request.endpoint == 'admin.panel' %} active{% endif %}" href="{{ url_for('admin.panel') }}">管理</a>
     {% endif %}

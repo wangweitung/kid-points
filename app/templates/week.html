@@ -18,48 +18,51 @@
   <a class="btn btn-ghost" href="{{ url_for('views.week', date=next_date, child=child['id']) }}">下周 →</a>
 </div>
 
-<div class="table-wrap card">
-  <table class="week-table">
-    <thead>
-      <tr>
-        <th class="col-task">做什么</th>
-        <th class="col-value">分值</th>
-        {% for i in range(7) %}
-        <th class="col-day{% if days[i] == today_d %} today{% endif %}">
-          <span class="col-day-date">{{ days[i].strftime('%m-%d') }}</span>
-          <span class="col-day-name">{{ weekday_names[i] }}</span>
-        </th>
-        {% endfor %}
-        <th class="col-sum">本周得分</th>
-        <th class="col-sum">完成天数</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in task_rows %}
-      <tr>
-        <td class="col-task">{{ row.task['name'] }}</td>
-        <td class="col-value">{{ row.task['value']|fmt }}</td>
-        {% for i in range(7) %}
-          {% set d = days[i] %}
-          {% set locked = d < today_d and not past_edit %}
-          <td class="cell{% if row.checked[i] %} done{% endif %}{% if d > today_d %} future{% endif %}{% if locked %} locked{% endif %}"
-              {% if d <= today_d and not locked %}data-tick data-child="{{ child['id'] }}" data-task="{{ row.task['id'] }}" data-date="{{ d.isoformat() }}"{% endif %}>{% if row.checked[i] %}✓{% endif %}</td>
-        {% endfor %}
-        <td class="num col-sum" data-task-score="{{ row.task['id'] }}">{{ row.score|fmt if row.score is not none else '' }}</td>
-        <td class="num col-sum" data-task-days="{{ row.task['id'] }}">{{ row.days }}</td>
-      </tr>
+<div class="card week-board">
+  <div class="wrow wrow-head">
+    <span class="wc wc-name">做什么</span>
+    <span class="wc wc-value num">分值</span>
+    <div class="wc-daystrip">
+      {% for i in range(7) %}
+      <span class="wc wc-day{% if days[i] == today_d %} today{% endif %}">
+        <span class="wc-day-date">{{ days[i].strftime('%m-%d') }}</span>
+        <span class="wc-day-name">{{ weekday_names[i] }}</span>
+      </span>
       {% endfor %}
-      <tr class="row-total">
-        <td class="col-task">今日得分</td>
-        <td class="col-value"></td>
-        {% for d in days %}
-          <td class="num col-day" data-day-total="{{ d.isoformat() }}">{{ day_totals[loop.index0]|fmt if day_totals[loop.index0] else '' }}</td>
-        {% endfor %}
-        <td class="num col-sum" id="week-total">{{ week_score|fmt }}</td>
-        <td class="num col-sum" id="week-days">{{ week_days }}</td>
-      </tr>
-    </tbody>
-  </table>
+    </div>
+    <span class="wc wc-score num">本周得分</span>
+    <span class="wc wc-days num">完成天数</span>
+  </div>
+  {% for row in task_rows %}
+  <div class="wrow wrow-task">
+    <span class="wc wc-name">{{ row.task['name'] }}</span>
+    <span class="wc wc-value num">+{{ row.task['value']|fmt }}</span>
+    <div class="wc-daystrip">
+      {% for i in range(7) %}
+        {% set d = days[i] %}
+        {% set locked = d < today_d and not past_edit %}
+        <span class="wc wc-day cell{% if row.checked[i] %} done{% endif %}{% if d > today_d %} future{% endif %}{% if locked %} locked{% endif %}"
+              {% if d <= today_d and not locked %}data-tick data-child="{{ child['id'] }}" data-task="{{ row.task['id'] }}" data-date="{{ d.isoformat() }}"{% endif %}>
+          <span class="wc-day-date">{{ d.strftime('%d') }}</span>
+          <span class="cell-mark">{% if row.checked[i] %}✓{% endif %}</span>
+        </span>
+      {% endfor %}
+    </div>
+    <span class="wc wc-score num" data-task-score="{{ row.task['id'] }}">{{ row.score|fmt if row.score is not none else '' }}</span>
+    <span class="wc wc-days num" data-task-days="{{ row.task['id'] }}">{{ row.days }}</span>
+  </div>
+  {% endfor %}
+  <div class="wrow wrow-total">
+    <span class="wc wc-name">本周合计</span>
+    <span class="wc wc-value num"></span>
+    <div class="wc-daystrip">
+      {% for d in days %}
+      <span class="wc wc-day num" data-day-total="{{ d.isoformat() }}">{{ day_totals[loop.index0]|fmt if day_totals[loop.index0] else '' }}</span>
+      {% endfor %}
+    </div>
+    <span class="wc wc-score num" id="week-total">{{ week_score|fmt }}</span>
+    <span class="wc wc-days num" id="week-days">{{ week_days }}</span>
+  </div>
 </div>
 
 <div class="week-cols">

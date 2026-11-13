@@ -279,45 +279,67 @@ table { border-collapse: collapse; width: 100%; }
 .expense { color: var(--danger); font-weight: 600; }
 .row-inactive td { opacity: 0.55; }
 
-.week-table th, .week-table td {
+/* week board: grid layout, no horizontal scroll on mobile */
+.week-board {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.5fr) 52px repeat(7, minmax(44px, 1fr)) 60px 68px;
+  align-items: center;
+  padding: 4px 14px 8px;
+  overflow: visible;
+}
+.wrow { display: contents; }
+.wc {
+  padding: 8px 4px;
   border-bottom: 1px solid var(--grid);
-  padding: 8px 6px;
   text-align: center;
+  min-width: 0;
 }
-.week-table .col-task { text-align: left; min-width: 220px; padding-left: 16px; }
-.week-table .col-value, .week-table .col-sum { font-variant-numeric: tabular-nums; }
-.week-table thead th {
-  color: var(--muted);
-  font-size: 13px;
-  background: rgba(11, 11, 11, 0.02);
+.wc-name {
+  text-align: left;
+  padding-left: 6px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
 }
-.col-day-date {
+.wc-value, .wc-score, .wc-days { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wc-daystrip { display: contents; }
+.wc-day-date { display: none; }
+.wrow-head .wc { color: var(--muted); font-size: 13px; font-weight: 600; background: rgba(28, 30, 38, 0.02); }
+.wrow-head .wc-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+.wrow-head .wc-day-date {
   display: block;
   font-size: 11px;
   font-weight: 400;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.col-day-name { display: block; font-weight: 600; }
-.col-day.today .col-day-date { color: var(--primary); }
-.col-day.today .col-day-name { color: var(--primary); }
-.week-table .num { text-align: right; padding-right: 12px; }
-.cell {
-  width: 46px;
-  min-width: 46px;
+.wc-day-name { display: block; font-weight: 600; }
+.wc-day.today .wc-day-date { color: var(--primary); }
+.wc-day.today .wc-day-name { color: var(--primary); }
+.wc.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 42px;
   cursor: pointer;
   user-select: none;
   font-weight: 700;
-  color: transparent;
   border-radius: 8px;
 }
-.cell:hover:not(.future):not(.locked) { background: rgba(42, 120, 214, 0.1); }
-.cell.done { background: var(--good); color: #fff; }
-.cell.future { cursor: default; background: rgba(11, 11, 11, 0.03); }
-.cell.locked { cursor: default; }
-.cell.busy { opacity: 0.6; pointer-events: none; }
-.row-total td { background: rgba(11, 11, 11, 0.03); font-weight: 700; border-top: 2px solid var(--grid); }
+.wc.cell .cell-mark { color: transparent; line-height: 1.2; }
+.wc.cell:hover:not(.future):not(.locked) { background: rgba(42, 120, 214, 0.1); }
+.wc.cell.done { background: var(--good); border-color: var(--good); }
+.wc.cell.done .cell-mark { color: #fff; }
+.wc.cell.future { cursor: default; background: rgba(28, 30, 38, 0.03); }
+.wc.cell.locked { cursor: default; }
+.wc.cell.busy { opacity: 0.6; pointer-events: none; }
+.wrow-total .wc {
+  background: rgba(28, 30, 38, 0.03);
+  font-weight: 700;
+  border-bottom: none;
+  border-top: 2px solid var(--grid);
+  padding: 10px 4px;
+}
 
 /* ---------- month calendar ---------- */
 .cal-card { padding: 14px; }
@@ -603,17 +625,46 @@ code {
   .btn { padding: 10px 18px; font-size: 15px; }
   .nav a.active { box-shadow: none; }
   .task-card { padding: 15px 14px; }
-  .cell { width: 44px; min-width: 44px; height: 46px; }
 
-  /* tables: keep the task/date column visible while scrolling sideways */
-  .week-table .col-task {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    background: var(--surface);
-    box-shadow: 1px 0 0 var(--grid);
+  /* week board: card-style rows, no horizontal scrolling */
+  .week-board { display: block; padding: 2px 14px 8px; }
+  .wrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grid);
   }
-  .week-table .row-total .col-task { background: rgba(28, 30, 38, 0.03); }
+  .wrow-head { display: none; }
+  .wc { border: none; padding: 0; }
+  .wc-name { flex: 1 1 auto; font-weight: 600; }
+  .wc-value { flex: 0 0 auto; color: var(--muted); font-weight: 600; }
+  .wc-score::before { content: "得分 "; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .wc-days::before { content: "天数 "; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .wc-daystrip { flex: 0 0 100%; display: flex; gap: 4px; margin-top: 6px; }
+  .wc-day-date {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .wc.cell { flex: 1 1 0; min-width: 0; height: 44px; }
+  .wc.cell.done .wc-day-date { color: rgba(255, 255, 255, 0.85); }
+  .wrow-total {
+    background: rgba(28, 30, 38, 0.03);
+    margin: 4px -14px -8px;
+    padding: 10px 14px;
+    border-radius: 0 0 14px 14px;
+    border-bottom: none;
+  }
+  .wrow-total .wc { background: transparent; border-top: none; padding: 0; }
+  .wrow-total .wc-day { flex: 1 1 0; min-width: 0; text-align: center; font-weight: 700; }
+  .wrow-total .wc-score::before, .wrow-total .wc-days::before { content: none; }
+  .wrow-total .wc-name { flex: 1 1 auto; }
+
+  /* tables: keep the date column visible while scrolling sideways */
   .data-table th:first-child, .data-table td:first-child {
     position: sticky;
     left: 0;

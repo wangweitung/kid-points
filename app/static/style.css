@@ -289,19 +289,24 @@ table { border-collapse: collapse; width: 100%; }
 .week-board {
   display: grid;
   grid-template-columns: minmax(10em, 2fr) 3.5em repeat(7, minmax(3.2em, 1fr)) 4em 4.5em;
-  align-items: center;
-  column-gap: 6px;
+  /* 拉伸：同一行的格子的分隔线严格对齐 */
+  align-items: stretch;
   padding: 8px 16px 12px;
   overflow: visible;
 }
 .wrow { display: contents; }
 .wc {
-  padding: 10px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
   border-bottom: 1px solid var(--grid);
   text-align: center;
   min-width: 0;
 }
+.wc.num { justify-content: flex-end; }
 .wc-name {
+  justify-content: flex-start;
   text-align: left;
   padding-left: 8px;
   font-weight: 500;
@@ -329,21 +334,30 @@ table { border-collapse: collapse; width: 100%; }
 .wc-day.today .wc-day-date { color: var(--primary); }
 .wc-day.today .wc-day-name { color: var(--primary); }
 .wc.cell {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 46px;
+  min-height: 46px;
+  padding: 4px;
   cursor: pointer;
   user-select: none;
   font-weight: 700;
-  border-radius: 8px;
 }
-.wc.cell .cell-mark { color: transparent; line-height: 1.2; }
-.wc.cell:hover:not(.future):not(.locked) { background: rgba(77, 125, 255, 0.08); }
-.wc.cell.done { background: var(--good-grad); }
-.wc.cell.done .cell-mark { color: #fff; }
-.wc.cell.future { cursor: default; background: var(--fill); }
+/* 色块画在内衬层，格子本体保持等高、边线连续 */
+.wc.cell::before {
+  content: "";
+  position: absolute;
+  inset: 3px 4px;
+  border-radius: 8px;
+  background: transparent;
+}
+.wc.cell .cell-mark { color: transparent; line-height: 1.2; position: relative; }
+.wc.cell:hover:not(.future):not(.locked):not(.done)::before { background: rgba(77, 125, 255, 0.14); }
+.wc.cell.done::before { background: var(--good-grad); }
+.wc.cell.future { cursor: default; }
+.wc.cell.future::before { background: var(--fill); }
 .wc.cell.locked { cursor: default; }
 .wc.cell.busy { opacity: 0.6; pointer-events: none; }
 .wrow-total .wc {
@@ -721,6 +735,7 @@ code {
     background: var(--surface);
     align-items: flex-start;
   }
+  .wc.cell::before { content: none; }
   .wc.cell .cell-mark { margin: auto; font-size: 16px; }
   .wc.cell.done { background: var(--good-grad); }
   .wc.cell.done .wc-day-date { color: rgba(255, 255, 255, 0.9); }

@@ -35,7 +35,7 @@
   </div>
   {% for row in task_rows %}
   <div class="wrow wrow-task">
-    <span class="wc wc-name">{{ row.task['name'] }}</span>
+    <span class="wc wc-name" title="{{ row.task['name'] }}"><span class="wc-name-text">{{ row.task['name'] }}</span></span>
     <span class="wc wc-value num">+{{ row.task['value']|fmt }}</span>
     <div class="wc-daystrip">
       {% for i in range(7) %}

@@ -310,7 +310,14 @@ table { border-collapse: collapse; width: 100%; }
   text-align: left;
   padding-left: 8px;
   font-weight: 500;
-  overflow-wrap: anywhere;
+}
+/* 任务名单行显示，超长省略，悬浮看全名 */
+.wc-name-text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .wc-value, .wc-score, .wc-days { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .wc-daystrip { display: contents; }
@@ -356,6 +363,7 @@ table { border-collapse: collapse; width: 100%; }
 .wc.cell .cell-mark { color: transparent; line-height: 1.2; position: relative; }
 .wc.cell:hover:not(.future):not(.locked):not(.done)::before { background: rgba(77, 125, 255, 0.14); }
 .wc.cell.done::before { background: var(--good-grad); }
+.wc.cell.done .cell-mark { color: #fff; }
 .wc.cell.future { cursor: default; }
 .wc.cell.future::before { background: var(--fill); }
 .wc.cell.locked { cursor: default; }
@@ -712,6 +720,7 @@ code {
   .wrow-task:last-child, .wrow-total:last-child { margin-bottom: 0; }
   .wc { border: none; padding: 0; }
   .wc-name { flex: 1 1 auto; padding-left: 2px; font-weight: 600; }
+  .wc-name-text { white-space: normal; overflow: visible; }
   .wc-value { flex: 0 0 auto; color: var(--muted); font-weight: 600; }
   .wc-score::before { content: "得分 "; font-size: 12px; color: var(--muted); font-weight: 400; }
   .wc-days::before { content: "天数 "; font-size: 12px; color: var(--muted); font-weight: 400; }

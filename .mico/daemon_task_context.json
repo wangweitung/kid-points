@@ -1,8 +1,0 @@
-{
-  "tenant_id": "00000000-0000-0000-0000-000000000002",
-  "personal_owner_id": "1a4c79b3-2054-450f-84da-332c598fa095",
-  "managed_by": "mico-daemon-task",
-  "task_id": "01a1da56-99a6-7138-94a0-675d53414899",
-  "task_credential_path": "C:\\Users\\wangweidong\\mico_workspaces_desktop-mico.mioffice.cn\\_personal\\cda59acdd553cc791a32ff22\\01a1da56-99a6-7138-94a0-675d53414899\\.mico\\runtime-credentials\\task-token",
-  "agent_id": "a6ee9fe9-e921-4134-8624-81c5bb9d03aa"
-}

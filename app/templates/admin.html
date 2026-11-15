@@ -112,6 +112,65 @@
 </div>
 
 <div class="card">
+  <h2>价目管理</h2>
+  <form method="post" action="{{ url_for('views.catalog_add') }}" class="form-row table-add">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>名称 <input type="text" name="name" placeholder="如：去公园玩" required></label>
+    <label>分值 <input type="number" name="price" min="1" step="1" required></label>
+    <button type="submit" class="btn btn-primary">添加</button>
+  </form>
+  <div class="table-wrap">
+  <table class="data-table admin-table form-table">
+    <thead><tr><th>分值</th><th>名称</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+      {% for item in all_items %}
+      <tr class="{% if not item['active'] %}row-inactive{% endif %}">
+        <td colspan="4">
+          <form method="post" action="{{ url_for('views.catalog_update') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <input type="number" name="price" value="{{ item['price']|int if item['price'] == item['price']|int else item['price'] }}" min="1" step="1" class="w-90" title="分值">
+            <input type="text" name="name" value="{{ item['name'] }}" class="w-240" title="名称">
+            <button type="submit" class="btn btn-small">保存</button>
+          </form>
+          <form method="post" action="{{ url_for('views.catalog_toggle') }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <button type="submit" class="btn btn-small {% if item['active'] %}btn-ghost{% else %}btn-primary{% endif %}">
+              {% if item['active'] %}停用{% else %}启用{% endif %}
+            </button>
+          </form>
+          {% if not item['active'] %}<span class="tag tag-off">已停用</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>兑换记录</h2>
+  <p class="muted">{% if child %}{{ child['name'] }} · 本月{% else %}本月{% endif %}</p>
+  <div class="table-wrap">
+  <table class="data-table admin-table">
+    <thead><tr><th>日期</th><th>兑换了什么</th><th class="num">支出 −</th></tr></thead>
+    <tbody>
+      {% for h in history %}
+      <tr>
+        <td>{{ h['date'] }}</td>
+        <td>{{ h['reason'] }}</td>
+        <td class="num expense">{{ h['expense']|fmt }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="muted center">本月还没有兑换记录</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
   <h2>用户管理</h2>
   <div class="table-wrap">
   <table class="data-table admin-table">

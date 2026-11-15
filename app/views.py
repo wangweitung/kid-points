@@ -437,17 +437,8 @@ def redeem():
     items = db.execute(
         "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
     ).fetchall()
-    all_items = db.execute(
-        "SELECT * FROM catalog ORDER BY active DESC, sort_order, id"
-    ).fetchall()
     now = local_today()
     first = date(now.year, now.month, 1)
-    history = db.execute(
-        """SELECT * FROM ledger
-           WHERE child_id = ? AND source = 'redeem' AND date >= ?
-           ORDER BY date DESC, id DESC LIMIT 50""",
-        (child["id"], first.isoformat()),
-    ).fetchall()
     month_spent = db.execute(
         """SELECT COALESCE(SUM(expense), 0) AS s FROM ledger
            WHERE child_id = ? AND source = 'redeem' AND date >= ?""",
@@ -459,8 +450,6 @@ def redeem():
         child=child,
         children=children,
         items=items,
-        all_items=all_items,
-        history=history,
         balance=balance,
         month_redemptions=round(month_spent, 2),
     )
@@ -518,7 +507,7 @@ def catalog_add():
         )
         db.commit()
         flash("已添加", "ok")
-    return redirect(url_for("views.redeem"))
+    return redirect(url_for("admin.panel"))
 
 
 @bp.post("/catalog/update")
@@ -537,7 +526,7 @@ def catalog_update():
         )
         db.commit()
         flash("已更新", "ok")
-    return redirect(url_for("views.redeem"))
+    return redirect(url_for("admin.panel"))
 
 
 @bp.post("/catalog/delete")
@@ -552,7 +541,7 @@ def catalog_delete():
     )
     db.commit()
     flash("已下架" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
-    return redirect(url_for("views.redeem"))
+    return redirect(url_for("admin.panel"))
 
 
 @bp.post("/catalog/toggle")
@@ -565,7 +554,7 @@ def catalog_toggle():
     )
     db.commit()
     flash("已更新商品状态" if cur.rowcount else "记录不存在", "ok" if cur.rowcount else "error")
-    return redirect(url_for("views.redeem"))
+    return redirect(url_for("admin.panel"))
 
 
 def _month_data(db, child, y: int, m: int) -> dict:

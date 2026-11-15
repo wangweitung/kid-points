@@ -5,53 +5,41 @@
   <h1>管理</h1>
 </div>
 
-<div class="admin-grid">
-  <div class="card">
-    <h2>开关</h2>
-    <p class="muted">注册：关闭后登录页不显示注册入口。补记：关闭后只能修改今天的打卡。</p>
-    <div class="switch-row">
-      <form method="post" action="{{ url_for('admin.registration') }}" class="inline-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% if registration_open %}
-          <input type="hidden" name="open" value="0">
-          <button type="submit" class="btn btn-danger">注册已开启 · 点击关闭</button>
-        {% else %}
-          <input type="hidden" name="open" value="1">
-          <button type="submit" class="btn btn-primary">注册已关闭 · 点击开启</button>
-        {% endif %}
-      </form>
-      <form method="post" action="{{ url_for('admin.past_edit') }}" class="inline-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% if past_edit %}
-          <input type="hidden" name="open" value="0">
-          <button type="submit" class="btn btn-danger">可修改过去 · 点击关闭</button>
-        {% else %}
-          <input type="hidden" name="open" value="1">
-          <button type="submit" class="btn btn-primary">不可修改过去 · 点击开启</button>
-        {% endif %}
-      </form>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>添加</h2>
-    <form method="post" action="{{ url_for('admin.task_add') }}" class="form-row">
+<div class="card">
+  <h2>开关</h2>
+  <p class="muted">注册：关闭后登录页不显示注册入口。补记：关闭后只能修改今天的打卡。</p>
+  <div class="switch-row">
+    <form method="post" action="{{ url_for('admin.registration') }}" class="inline-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label>任务 <input type="text" name="name" placeholder="如：练琴 30 分钟" required></label>
-      <label>分值 <input type="number" name="value" min="0.5" step="0.5" required></label>
-      <button type="submit" class="btn btn-primary">添加任务</button>
+      {% if registration_open %}
+        <input type="hidden" name="open" value="0">
+        <button type="submit" class="btn btn-danger">注册已开启 · 点击关闭</button>
+      {% else %}
+        <input type="hidden" name="open" value="1">
+        <button type="submit" class="btn btn-primary">注册已关闭 · 点击开启</button>
+      {% endif %}
     </form>
-    <form method="post" action="{{ url_for('admin.child_add') }}" class="form-row">
+    <form method="post" action="{{ url_for('admin.past_edit') }}" class="inline-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label>姓名 <input type="text" name="name" placeholder="如：Morning" required></label>
-      <label>期初余额 <input type="number" name="initial_balance" min="0" step="1" value="0"></label>
-      <button type="submit" class="btn btn-primary">添加小朋友</button>
+      {% if past_edit %}
+        <input type="hidden" name="open" value="0">
+        <button type="submit" class="btn btn-danger">可修改过去 · 点击关闭</button>
+      {% else %}
+        <input type="hidden" name="open" value="1">
+        <button type="submit" class="btn btn-primary">不可修改过去 · 点击开启</button>
+      {% endif %}
     </form>
   </div>
 </div>
 
 <div class="card">
   <h2>任务管理</h2>
+  <form method="post" action="{{ url_for('admin.task_add') }}" class="form-row table-add">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>任务 <input type="text" name="name" placeholder="如：练琴 30 分钟" required></label>
+    <label>分值 <input type="number" name="value" min="0.5" step="0.5" required></label>
+    <button type="submit" class="btn btn-primary">添加任务</button>
+  </form>
   <div class="table-wrap">
   <table class="data-table admin-table form-table">
     <thead><tr><th>任务</th><th>分值</th><th>状态</th><th>操作</th></tr></thead>
@@ -84,6 +72,12 @@
 
 <div class="card">
   <h2>小朋友管理</h2>
+  <form method="post" action="{{ url_for('admin.child_add') }}" class="form-row table-add">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>姓名 <input type="text" name="name" placeholder="如：Morning" required></label>
+    <label>期初余额 <input type="number" name="initial_balance" min="0" step="1" value="0"></label>
+    <button type="submit" class="btn btn-primary">添加小朋友</button>
+  </form>
   <div class="table-wrap">
   <table class="data-table admin-table form-table">
     <thead><tr><th>姓名</th><th>期初余额</th><th>状态</th><th>操作</th></tr></thead>

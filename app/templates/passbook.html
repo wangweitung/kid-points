@@ -69,7 +69,7 @@
 {% if session.get('role') == 'admin' %}
 <div class="card">
   <h2>手动记一笔</h2>
-  <form method="post" action="{{ url_for('views.passbook_add') }}" class="form-row">
+  <form method="post" action="{{ url_for('views.passbook_add') }}" class="form-row pb-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>日期 <input type="date" name="date" value="{{ today_d.isoformat() }}" max="{{ today_d.isoformat() }}"></label>
     <label>事由 <input type="text" name="reason" placeholder="如：做家务奖励 / 买零食" required></label>

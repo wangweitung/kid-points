@@ -511,20 +511,11 @@ table { border-collapse: collapse; width: 100%; }
 .table-view summary { cursor: pointer; font-weight: 600; color: var(--ink-2); }
 
 /* ---------- admin ---------- */
-.admin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: var(--gap);
-  margin-bottom: var(--gap);
-}
-.admin-grid .card { margin-bottom: 0; }
 .switch-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .switch-row .inline-form { margin: 0; }
-.admin-grid .form-row + .form-row {
-  border-top: 1px solid var(--grid);
-  margin-top: 14px;
-  padding-top: 14px;
-}
+/* 管理卡内：添加行与下方列表之间留出分隔 */
+.table-add { margin-bottom: 4px; }
+.table-add + .table-wrap { border-top: 1px solid var(--grid); margin-top: 12px; padding-top: 4px; }
 .inline { display: inline; }
 .inline-form { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-right: 8px; }
 .form-row {
@@ -785,6 +776,33 @@ code {
   .form-row { flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; }
   .form-row label { flex: 1 1 140px; width: auto; }
   .form-row input { width: 100%; }
+
+  /* 手动记一笔：网格紧凑布局 */
+  .pb-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+      "date income expense"
+      "reason reason reason"
+      "note note action";
+    gap: 8px;
+    align-items: end;
+  }
+  .pb-form > input[type="hidden"] { display: none; }
+  .pb-form > label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--ink-2);
+    min-width: 0;
+  }
+  .pb-form > label:nth-child(2) { grid-area: date; }
+  .pb-form > label:nth-child(3) { grid-area: reason; }
+  .pb-form > label:nth-child(4) { grid-area: income; }
+  .pb-form > label:nth-child(5) { grid-area: expense; }
+  .pb-form > label:nth-child(6) { grid-area: note; }
+  .pb-form > .btn { grid-area: action; }
   .form-row .btn { flex: 0 0 auto; }
 
   /* passbook: stacked entries */
@@ -797,12 +815,13 @@ code {
     box-shadow: none;
     min-width: 0;
   }
-  .pb-table tbody, .pb-table tbody tr {
+  /* 整表块化：否则表格布局会给 flex 行套匿名单元并收缩 */
+  .pb-table, .pb-table tbody, .pb-table tfoot { display: block; width: 100%; }
+  .pb-table tbody tr {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
   }
-  .pb-table tbody { width: 100%; }
   .pb-table tbody tr {
     gap: 2px 8px;
     padding: 11px 0;
@@ -820,9 +839,9 @@ code {
   .pb-reason { order: 3; flex: 1 1 100%; font-weight: 600; }
   .pb-income { order: 4; }
   .pb-expense { order: 5; }
-  .pb-balance { order: 6; margin-left: auto; }
+  .pb-balance { order: 6; margin-left: auto; font-weight: 700; }
   .pb-note { order: 7; flex: 1 1 100%; font-size: 12px; }
-  .pb-action { order: 8; margin-left: auto; }
+  .pb-action { order: 8; margin-left: 8px; }
   .pb-table tfoot, .pb-table tfoot tr { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
   .pb-table tfoot tr { width: 100%; padding: 8px 0 0; border-top: 2px solid var(--grid); }
   .pb-table tfoot td { display: block; padding: 0; border-top: none; }
@@ -831,7 +850,8 @@ code {
 
   .admin-table thead { display: none; }
   /* 每条记录压成一行：输入框 + 按钮 + 标签横排，仅在放不下时换行 */
-  .admin-table tr {
+  /* 用 tbody tr 提高权重，避免被 .form-table tbody tr 的 display:block 覆盖 */
+  .admin-table tbody tr {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -839,7 +859,7 @@ code {
     padding: 11px 0;
     border-bottom: 1px solid var(--grid);
   }
-  .admin-table tr:last-child { border-bottom: none; }
+  .admin-table tbody tr:last-child { border-bottom: none; }
   .admin-table.data-table td { display: contents; }
   .admin-table .inline-form {
     display: flex;
@@ -851,6 +871,7 @@ code {
   }
   .admin-table .inline-form input { flex: 1 1 110px; width: auto; min-width: 0; }
   .admin-table .inline-form input.w-90 { flex: 0 1 64px; }
+  .admin-table .inline-form input.w-140 { flex: 0 1 90px; }
   .admin-table .inline-form select { flex: 1 1 110px; min-width: 0; }
   .admin-table .inline { display: flex; margin: 0; flex: 0 0 auto; }
   .admin-table .inline form { display: flex; align-items: center; gap: 6px; }

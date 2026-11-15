@@ -46,14 +46,11 @@
     <tbody>
       {% for t in tasks %}
       <tr class="{% if not t['active'] %}row-inactive{% endif %}">
-        <td colspan="4">
-          <form method="post" action="{{ url_for('admin.task_update') }}" class="inline-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="id" value="{{ t['id'] }}">
-            <input type="text" name="name" value="{{ t['name'] }}" class="w-320" title="任务名">
-            <input type="number" name="value" value="{{ t['value']|int if t['value'] == t['value']|int else t['value'] }}" min="0.5" step="0.5" class="w-90" title="分值">
-            <button type="submit" class="btn btn-small">保存</button>
-          </form>
+        <td><input type="text" name="name" form="task-edit-{{ t['id'] }}" value="{{ t['name'] }}" title="任务名"></td>
+        <td><input type="number" name="value" form="task-edit-{{ t['id'] }}" value="{{ t['value']|int if t['value'] == t['value']|int else t['value'] }}" min="0.5" step="0.5" title="分值"></td>
+        <td>{% if not t['active'] %}<span class="tag tag-off">已停用</span>{% endif %}</td>
+        <td class="row-actions">
+          <button type="submit" form="task-edit-{{ t['id'] }}" class="btn btn-small">保存</button>
           <form method="post" action="{{ url_for('admin.task_toggle') }}" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ t['id'] }}">
@@ -61,12 +58,17 @@
               {% if t['active'] %}停用{% else %}启用{% endif %}
             </button>
           </form>
-          {% if not t['active'] %}<span class="tag tag-off">已停用</span>{% endif %}
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  {% for t in tasks %}
+  <form id="task-edit-{{ t['id'] }}" method="post" action="{{ url_for('admin.task_update') }}" class="hidden-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" value="{{ t['id'] }}">
+  </form>
+  {% endfor %}
   </div>
 </div>
 
@@ -84,15 +86,11 @@
     <tbody>
       {% for c in children %}
       <tr class="{% if not c['active'] %}row-inactive{% endif %}">
-        <td colspan="4">
-          <form method="post" action="{{ url_for('admin.child_update') }}" class="inline-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="id" value="{{ c['id'] }}">
-            <input type="text" name="name" value="{{ c['name'] }}" class="w-240" title="姓名">
-            <input type="number" name="initial_balance" value="{{ c['initial_balance']|fmt }}" min="0" step="1" class="w-140" title="期初余额">
-            <input type="hidden" name="active" value="{{ 1 if c['active'] else 0 }}">
-            <button type="submit" class="btn btn-small">保存</button>
-          </form>
+        <td><input type="text" name="name" form="child-edit-{{ c['id'] }}" value="{{ c['name'] }}" title="姓名"></td>
+        <td><input type="number" name="initial_balance" form="child-edit-{{ c['id'] }}" value="{{ c['initial_balance']|fmt }}" min="0" step="1" title="期初余额"></td>
+        <td>{% if not c['active'] %}<span class="tag tag-off">已停用</span>{% endif %}</td>
+        <td class="row-actions">
+          <button type="submit" form="child-edit-{{ c['id'] }}" class="btn btn-small">保存</button>
           <form method="post" action="{{ url_for('admin.child_update') }}" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ c['id'] }}">
@@ -108,11 +106,18 @@
       {% endfor %}
     </tbody>
   </table>
+  {% for c in children %}
+  <form id="child-edit-{{ c['id'] }}" method="post" action="{{ url_for('admin.child_update') }}" class="hidden-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" value="{{ c['id'] }}">
+    <input type="hidden" name="active" value="{{ 1 if c['active'] else 0 }}">
+  </form>
+  {% endfor %}
   </div>
 </div>
 
 <div class="card">
-  <h2>价目管理</h2>
+  <h2>兑换管理</h2>
   <form method="post" action="{{ url_for('views.catalog_add') }}" class="form-row table-add">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>名称 <input type="text" name="name" placeholder="如：去公园玩" required></label>
@@ -125,14 +130,11 @@
     <tbody>
       {% for item in all_items %}
       <tr class="{% if not item['active'] %}row-inactive{% endif %}">
-        <td colspan="4">
-          <form method="post" action="{{ url_for('views.catalog_update') }}" class="inline-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="id" value="{{ item['id'] }}">
-            <input type="number" name="price" value="{{ item['price']|int if item['price'] == item['price']|int else item['price'] }}" min="1" step="1" class="w-90" title="分值">
-            <input type="text" name="name" value="{{ item['name'] }}" class="w-240" title="名称">
-            <button type="submit" class="btn btn-small">保存</button>
-          </form>
+        <td><input type="number" name="price" form="item-edit-{{ item['id'] }}" value="{{ item['price']|int if item['price'] == item['price']|int else item['price'] }}" min="1" step="1" title="分值"></td>
+        <td><input type="text" name="name" form="item-edit-{{ item['id'] }}" value="{{ item['name'] }}" title="名称"></td>
+        <td>{% if not item['active'] %}<span class="tag tag-off">已停用</span>{% endif %}</td>
+        <td class="row-actions">
+          <button type="submit" form="item-edit-{{ item['id'] }}" class="btn btn-small">保存</button>
           <form method="post" action="{{ url_for('views.catalog_toggle') }}" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ item['id'] }}">
@@ -140,12 +142,17 @@
               {% if item['active'] %}停用{% else %}启用{% endif %}
             </button>
           </form>
-          {% if not item['active'] %}<span class="tag tag-off">已停用</span>{% endif %}
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  {% for item in all_items %}
+  <form id="item-edit-{{ item['id'] }}" method="post" action="{{ url_for('views.catalog_update') }}" class="hidden-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" value="{{ item['id'] }}">
+  </form>
+  {% endfor %}
   </div>
 </div>
 

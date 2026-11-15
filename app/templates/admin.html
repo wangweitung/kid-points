@@ -36,8 +36,8 @@
   <h2>任务管理</h2>
   <form method="post" action="{{ url_for('admin.task_add') }}" class="form-row table-add">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>任务 <input type="text" name="name" placeholder="如：练琴 30 分钟" required></label>
-    <label>分值 <input type="number" name="value" min="0.5" step="0.5" required></label>
+    <label><span class="fl">任务</span><input type="text" name="name" placeholder="如：练琴 30 分钟" required></label>
+    <label><span class="fl">分值</span><input type="number" name="value" min="0.5" step="0.5" required></label>
     <button type="submit" class="btn btn-primary">添加任务</button>
   </form>
   <div class="table-wrap">
@@ -76,8 +76,8 @@
   <h2>小朋友管理</h2>
   <form method="post" action="{{ url_for('admin.child_add') }}" class="form-row table-add">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>姓名 <input type="text" name="name" placeholder="如：Morning" required></label>
-    <label>期初余额 <input type="number" name="initial_balance" min="0" step="1" value="0"></label>
+    <label><span class="fl">姓名</span><input type="text" name="name" placeholder="如：Morning" required></label>
+    <label><span class="fl">期初余额</span><input type="number" name="initial_balance" min="0" step="1" value="0"></label>
     <button type="submit" class="btn btn-primary">添加小朋友</button>
   </form>
   <div class="table-wrap">
@@ -120,8 +120,8 @@
   <h2>兑换管理</h2>
   <form method="post" action="{{ url_for('views.catalog_add') }}" class="form-row table-add">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>名称 <input type="text" name="name" placeholder="如：去公园玩" required></label>
-    <label>分值 <input type="number" name="price" min="1" step="1" required></label>
+    <label><span class="fl">名称</span><input type="text" name="name" placeholder="如：去公园玩" required></label>
+    <label><span class="fl">分值</span><input type="number" name="price" min="1" step="1" required></label>
     <button type="submit" class="btn btn-primary">添加</button>
   </form>
   <div class="table-wrap">

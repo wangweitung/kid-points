@@ -13,7 +13,7 @@
       <tr><td>为什么只能打 √</td><td>每天的分数是自动算的。点一下格子就是 √，再点一下取消。</td></tr>
       <tr><td>本周得分 / 完成天数</td><td>自动累加这一项一周的分数；「完成天数」能看出她这项到底坚持了几天。</td></tr>
       <tr><td>期初结余</td><td>取上一周转入的结余，与「积分存折」的余额自动对齐。</td></tr>
-      <tr><td>本周兑换</td><td>在「兑换」页操作，存折会自动记一笔支出，余额自动跟上。</td></tr>
+      <tr><td>本周兑换</td><td>在「存折」页操作，存折会自动记一笔支出，余额自动跟上。</td></tr>
       <tr><td>分值可以改</td><td>分值随时能改，所有合计自动跟着变（含历史每日得分）。但一周内别改，改规则放在周日。</td></tr>
       <tr><td>已经给出去的积分不撤回</td><td>她做错了，扣的是「今天这一项」，不是存折里的数。撤回承诺，这套规则就失效了。</td></tr>
       <tr><td>生气本身不扣分</td><td>分数只奖「她做了什么来降温」。因为情绪被罚，她只会学会把情绪藏起来。</td></tr>
@@ -31,7 +31,6 @@
     <a href="#page-week">周视图</a>
     <a href="#page-month">月视图</a>
     <a href="#page-passbook">存折</a>
-    <a href="#page-redeem">兑换</a>
     <a href="#page-charts">图表</a>
     <a href="#page-admin">管理</a>
     <a href="#page-auth">登录 / 注册</a>
@@ -80,16 +79,7 @@
       <tbody>
         <tr><td>流水表</td><td><code>.pb-table</code>；收入 <code>.income</code>、支出 <code>.expense</code>、来源 <code>.tag</code></td></tr>
         <tr><td>手动记一笔</td><td>管理员可见，<code>.form-row</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="guide-page">
-    <h2 id="page-redeem">兑换（<code>/redeem</code>，<code>redeem.html</code>）</h2>
-    <table class="data-table">
-      <tbody>
-        <tr><td>商品卡片</td><td><code>.redeem-card</code>；价格 <code>.redeem-price</code>，积分不足 <code>.poor</code></td></tr>
-        <tr><td>兑换记录 / 价目管理</td><td>记录表 <code>.data-table</code>；价目管理管理员可见</td></tr>
+        <tr><td>兑换区</td><td>管理员可见，商品卡片 <code>.redeem-card</code>；价格 <code>.redeem-price</code>，积分不足 <code>.poor</code>；价目在「管理 → 价目管理」维护</td></tr>
       </tbody>
     </table>
   </div>

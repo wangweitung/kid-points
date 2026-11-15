@@ -349,6 +349,17 @@ def passbook():
 
     pm, py = (12, y - 1) if m == 1 else (m - 1, y)
     nm, ny = (1, y + 1) if m == 12 else (m + 1, y)
+    # 兑换区数据：在售商品 + 本月（自然月）已兑换支出
+    items = db.execute(
+        "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
+    ).fetchall()
+    today = local_today()
+    rfirst = date(today.year, today.month, 1)
+    month_spent = db.execute(
+        """SELECT COALESCE(SUM(expense), 0) AS s FROM ledger
+           WHERE child_id = ? AND source = 'redeem' AND date >= ?""",
+        (child["id"], rfirst.isoformat()),
+    ).fetchone()["s"]
     return render_template(
         "passbook.html",
         child=child,
@@ -364,6 +375,8 @@ def passbook():
         initial_balance=child["initial_balance"],
         today_d=now,
         source_labels={"daily": "自动", "redeem": "兑换", "manual": "手动"},
+        items=items,
+        month_redemptions=round(month_spent, 2),
     )
 
 
@@ -430,29 +443,8 @@ def passbook_delete():
 
 @bp.get("/redeem")
 def redeem():
-    child, early, children = _need_child()
-    if early:
-        return early
-    db = get_db()
-    items = db.execute(
-        "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
-    ).fetchall()
-    now = local_today()
-    first = date(now.year, now.month, 1)
-    month_spent = db.execute(
-        """SELECT COALESCE(SUM(expense), 0) AS s FROM ledger
-           WHERE child_id = ? AND source = 'redeem' AND date >= ?""",
-        (child["id"], first.isoformat()),
-    ).fetchone()["s"]
-    balance = balance_of(child["id"])
-    return render_template(
-        "redeem.html",
-        child=child,
-        children=children,
-        items=items,
-        balance=balance,
-        month_redemptions=round(month_spent, 2),
-    )
+    # 兑换页已并入存折页，旧链接重定向过去
+    return redirect(url_for("views.passbook"))
 
 
 @bp.post("/redeem")
@@ -488,7 +480,7 @@ def redeem_do():
         except sqlite3.IntegrityError:
             db.rollback()
             flash("操作冲突，请重试", "error")
-    return redirect(url_for("views.redeem", child=child["id"]))
+    return redirect(url_for("views.passbook", child=child["id"]))
 
 
 @bp.post("/catalog/add")

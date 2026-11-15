@@ -9,6 +9,7 @@
   <div class="chips">
     <span class="chip">期初 <b>{{ initial_balance|fmt }}</b></span>
     <span class="chip chip-balance">当前余额 <b id="balance">{{ balance|fmt }}</b></span>
+    <span class="chip chip-score">本月已兑换 <b>{{ month_redemptions|fmt }}</b> 分</span>
   </div>
 </div>
 
@@ -78,6 +79,29 @@
     <label>备注 <input type="text" name="note"></label>
     <button type="submit" class="btn btn-primary">记入</button>
   </form>
+</div>
+
+<div class="card">
+  <h2>兑换</h2>
+  <p class="muted">点商品登记兑换，存折自动记一笔支出。</p>
+  <div class="redeem-grid">
+    {% for item in items %}
+    <div class="redeem-card{% if balance < item['price'] %} poor{% endif %}">
+      <div class="redeem-price">{{ item['price']|fmt }} <small>分</small></div>
+      <div class="redeem-name">{{ item['name'] }}</div>
+      <form method="post" action="{{ url_for('views.redeem_do') }}"
+            onsubmit="return confirm('确定用 {{ item['price']|fmt }} 分兑换「{{ item['name'] }}」吗？')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="item_id" value="{{ item['id'] }}">
+        <button type="submit" class="btn btn-primary" {% if balance < item['price'] %}disabled{% endif %}>
+          {% if balance < item['price'] %}积分不足{% else %}兑换{% endif %}
+        </button>
+      </form>
+    </div>
+    {% else %}
+    <p class="muted">还没有兑换商品，请到「管理 → 价目管理」添加。</p>
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 {% endblock %}

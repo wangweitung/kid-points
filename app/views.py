@@ -349,7 +349,8 @@ def passbook():
 
     pm, py = (12, y - 1) if m == 1 else (m - 1, y)
     nm, ny = (1, y + 1) if m == 12 else (m + 1, y)
-    # 兑换区数据：在售商品 + 本月（自然月）已兑换支出
+    # 兑换区数据：在售商品、本月（自然月）已兑换支出、所浏览月份的兑换记录
+    redeem_history = [e for e in reversed(entries) if e["source"] == "redeem"]
     items = db.execute(
         "SELECT * FROM catalog WHERE active = 1 ORDER BY sort_order, id"
     ).fetchall()
@@ -377,6 +378,7 @@ def passbook():
         source_labels={"daily": "自动", "redeem": "兑换", "manual": "手动"},
         items=items,
         month_redemptions=round(month_spent, 2),
+        redeem_history=redeem_history,
     )
 
 

@@ -10,14 +10,7 @@ from flask import (
 from werkzeug.security import generate_password_hash
 
 from .db import get_db, get_setting, set_setting
-from .helpers import (
-    admin_required,
-    current_child,
-    local_today,
-    parse_amount,
-    resync_all_daily,
-)
-from datetime import date
+from .helpers import admin_required, parse_amount, resync_all_daily
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -26,17 +19,6 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 @admin_required
 def panel():
     db = get_db()
-    child, children = current_child()
-    now = local_today()
-    first = date(now.year, now.month, 1)
-    history = []
-    if child:
-        history = db.execute(
-            """SELECT * FROM ledger
-               WHERE child_id = ? AND source = 'redeem' AND date >= ?
-               ORDER BY date DESC, id DESC LIMIT 50""",
-            (child["id"], first.isoformat()),
-        ).fetchall()
     return render_template(
         "admin.html",
         tasks=db.execute("SELECT * FROM tasks ORDER BY active DESC, sort_order, id").fetchall(),
@@ -45,8 +27,6 @@ def panel():
         all_items=db.execute(
             "SELECT * FROM catalog ORDER BY active DESC, sort_order, id"
         ).fetchall(),
-        history=history,
-        child=child,
         registration_open=get_setting("registration_open") == "1",
         past_edit=get_setting("allow_past_edit", "0") == "1",
         today_label=None,

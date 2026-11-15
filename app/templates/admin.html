@@ -150,27 +150,6 @@
 </div>
 
 <div class="card">
-  <h2>兑换记录</h2>
-  <p class="muted">{% if child %}{{ child['name'] }} · 本月{% else %}本月{% endif %}</p>
-  <div class="table-wrap">
-  <table class="data-table admin-table">
-    <thead><tr><th>日期</th><th>兑换了什么</th><th class="num">支出 −</th></tr></thead>
-    <tbody>
-      {% for h in history %}
-      <tr>
-        <td>{{ h['date'] }}</td>
-        <td>{{ h['reason'] }}</td>
-        <td class="num expense">{{ h['expense']|fmt }}</td>
-      </tr>
-      {% else %}
-      <tr><td colspan="3" class="muted center">本月还没有兑换记录</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-</div>
-
-<div class="card">
   <h2>用户管理</h2>
   <div class="table-wrap">
   <table class="data-table admin-table">

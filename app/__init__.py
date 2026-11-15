@@ -47,6 +47,28 @@ def create_app() -> Flask:
     app.config["SECRET_KEY"] = _secret_key(data_dir)
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["WTF_CSRF_TIME_LIMIT"] = None
+    # 静态资源长缓存：no-cache 会让手机端每次刷新都回源校验 CSS，
+    # 弱网下浏览器先把未加样式的 HTML 画出来（闪一下简陋页面）。
+    # 配合模板里的 mtime 版本号，文件更新后缓存自动失效。
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 30 * 24 * 3600
+
+    _asset_cache: dict = {}
+
+    @app.context_processor
+    def _assets():
+        def asset_url(filename: str) -> str:
+            path = Path(app.static_folder) / filename
+            try:
+                mtime = path.stat().st_mtime
+            except OSError:
+                mtime = 0
+            cached = _asset_cache.get(filename)
+            if cached is None or cached[0] != mtime:
+                url = url_for("static", filename=filename, v=int(mtime))
+                _asset_cache[filename] = (mtime, url)
+            return _asset_cache[filename][1]
+
+        return {"asset_url": asset_url}
 
     csrf.init_app(app)
     db.init_app(app)
